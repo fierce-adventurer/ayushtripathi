@@ -1,7 +1,6 @@
-import { useState } from 'react'
 import AgenticHero from './components/AgenticHero';
 import ProfileSidebar from './components/ProfileSidebar';
-
+import ProjectsSection from './components/ProjectsSection';
 import './App.css'
 
 function App() {
@@ -21,6 +20,9 @@ function App() {
         {/* We add a slight top margin on desktop to center it visually */}
         <div className="lg:col-span-8 w-full lg:mt-4">
           <AgenticHero />
+
+          {/* Projects Grid injected here! */}
+          <ProjectsSection />
         </div>
 
       </div>
