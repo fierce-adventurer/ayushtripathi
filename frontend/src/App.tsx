@@ -6,6 +6,7 @@ import ProjectsSection from './components/ProjectsSection';
 import AdminDashboard from './components/AdminDashboard';
 import MetricsSection from './components/MetricsSection';
 import SponsorSection from './components/SponsorSection';
+import ChatModal from './components/ChatModal';
 
 // The Single Page Architecture Layout
 function Portfolio() {
@@ -36,18 +37,8 @@ function Portfolio() {
         {/* Section 5: Wall of Fame & Sponsorship */}
         <SponsorSection />
 
-        {/* Placeholders for our next components */}
-        <div id="grind" className="pt-24 min-h-[30vh] border border-dashed border-zinc-800 rounded p-8 text-center text-textSecondary font-mono mt-12">
-          &gt; SYSTEM: [The Grind Stats Bar will load here]
-        </div>
-
-        <div id="sponsor" className="pt-24 min-h-[40vh] border border-dashed border-zinc-800 rounded p-8 text-center text-textSecondary font-mono mt-12">
-          &gt; SYSTEM: [Razorpay Sponsor Wall will load here]
-        </div>
-
-        <div id="chat" className="pt-24 min-h-[60vh] border border-dashed border-zinc-800 rounded p-8 text-center text-textSecondary font-mono mt-12 mb-24">
-          &gt; SYSTEM: [AI Chatbot Terminal will load here]
-        </div>
+        {/* Section 6: AI Chatbot Interface */}
+        <ChatModal />
 
       </main>
     </div>

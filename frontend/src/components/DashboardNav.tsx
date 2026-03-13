@@ -1,29 +1,37 @@
 const DashboardNav = () => {
   return (
-    <nav className="fixed top-8 left-1/2 transform -translate-x-1/2 z-50">
-      <div className="bg-surface/70 backdrop-blur-md border border-zinc-800/80 rounded-full px-8 py-3 flex items-center gap-8 shadow-2xl shadow-black/50">
+    <nav className="fixed top-6 left-1/2 transform -translate-x-1/2 z-50 w-[95%] max-w-4xl">
+      <div className="bg-zinc-950/90 backdrop-blur-md border border-zinc-800 rounded-xl p-2 flex items-center justify-between shadow-2xl">
         
-        {/* Navigation Links */}
-        <a href="#about" className="text-sm font-medium text-textSecondary hover:text-white transition-colors">~/about</a>
-        <a href="#experience" className="text-sm font-medium text-textSecondary hover:text-white transition-colors">~/experience</a>
-        <a href="#metrics" className="text-sm font-medium text-textSecondary hover:text-white transition-colors">~/metrics</a>
-        <a href="#projects" className="text-sm font-medium text-textSecondary hover:text-white transition-colors">~/projects</a>
+        {/* Left/Center Navigation Links */}
+        {/* We use overflow-x-auto so it doesn't break on slightly smaller screens */}
+        <div className="flex items-center gap-1 sm:gap-2 overflow-x-auto [&::-webkit-scrollbar]:hidden">
+          <a href="#about" className="px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-mono font-medium text-zinc-400 hover:text-white hover:bg-zinc-900 transition-colors">~/about</a>
+          <a href="#experience" className="px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-mono font-medium text-zinc-400 hover:text-white hover:bg-zinc-900 transition-colors">~/experience</a>
+          <a href="#metrics" className="px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-mono font-medium text-zinc-400 hover:text-white hover:bg-zinc-900 transition-colors">~/metrics</a>
+          <a href="#projects" className="px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-mono font-medium text-zinc-400 hover:text-white hover:bg-zinc-900 transition-colors">~/projects</a>
+        </div>
         
-        {/* NEW: The Sponsor Button triggers the global modal event */}
-        <button 
-          onClick={() => window.dispatchEvent(new Event('open-payment-gateway'))}
-          className="text-sm font-medium text-accent hover:text-blue-400 transition-colors cursor-pointer"
-        >
-          ~/sponsor_me
-        </button>
-        
-        {/* The Chat Button */}
-        <a 
-          href="#chat" 
-          className="ml-4 px-4 py-1.5 bg-accent/10 border border-accent/50 text-accent text-sm font-mono rounded-full hover:bg-accent hover:text-white transition-all"
-        >
-          ./talk_to_ai.sh
-        </a>
+        {/* Right Action Buttons */}
+        <div className="flex items-center gap-2 pl-2 border-l border-zinc-800 ml-2">
+          
+          {/* Sponsor Button */}
+          <button 
+            onClick={() => window.dispatchEvent(new Event('open-payment-gateway'))}
+            className="hidden sm:block px-3 py-2 rounded-lg text-sm font-mono font-medium text-zinc-400 hover:text-white hover:bg-zinc-900 transition-colors cursor-pointer"
+          >
+            ~/sponsor
+          </button>
+          
+          {/* AI Chat Button (High Contrast) */}
+          <button 
+            onClick={() => window.dispatchEvent(new Event('open-ai-chat'))}
+            className="px-4 py-2 bg-white text-zinc-950 text-xs sm:text-sm font-mono font-bold rounded-lg hover:bg-zinc-200 transition-all cursor-pointer"
+          >
+            ./talk_to_ai.sh
+          </button>
+
+        </div>
       </div>
     </nav>
   );
