@@ -1,34 +1,58 @@
+import { Routes, Route } from 'react-router-dom';
+import DashboardNav from './components/DashboardNav';
 import AgenticHero from './components/AgenticHero';
-import ProfileSidebar from './components/ProfileSidebar';
+import ExperienceSection from './components/ExperienceSection';
 import ProjectsSection from './components/ProjectsSection';
-import './App.css'
+import AdminDashboard from './components/AdminDashboard';
 
-function App() {
+// The Single Page Architecture Layout
+function Portfolio() {
   return (
-    // min-h-screen ensures it takes up the full viewport height
-    // max-w-7xl centers the content on ultra-wide monitors
-    <div className="min-h-screen bg-background p-4 sm:p-8 md:p-12 lg:p-24">
-      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-start">
+    <div className="relative min-h-screen bg-background text-textPrimary selection:bg-accent selection:text-white">
+      {/* Floating Top Nav */}
+      <DashboardNav />
+
+      {/* Main Content Wrapper - Centered for PC */}
+      <main className="max-w-4xl mx-auto px-8 pb-32">
         
-        {/* LEFT COLUMN: Takes up 4 out of 12 grid columns on large screens */}
-        {/* On mobile (default), it naturally stacks on top */}
-        <div className="lg:col-span-4 w-full">
-          <ProfileSidebar />
+        {/* Section 1: About (Hero) */}
+        <div id="about" className="pt-32 min-h-[70vh] flex flex-col justify-center">
+          <AgenticHero />
         </div>
 
-        {/* RIGHT COLUMN: Takes up 8 out of 12 grid columns on large screens */}
-        {/* We add a slight top margin on desktop to center it visually */}
-        <div className="lg:col-span-8 w-full lg:mt-4">
-          <AgenticHero />
+        {/* Section 2: Work Experience */}
+        <ExperienceSection />
 
-          {/* Projects Grid injected here! */}
+        {/* Section 3: Projects */}
+        <div id="projects" className="pt-24 min-h-[70vh]">
           <ProjectsSection />
         </div>
 
-      </div>
+        {/* Placeholders for our next components */}
+        <div id="grind" className="pt-24 min-h-[30vh] border border-dashed border-zinc-800 rounded p-8 text-center text-textSecondary font-mono mt-12">
+          &gt; SYSTEM: [The Grind Stats Bar will load here]
+        </div>
+
+        <div id="sponsor" className="pt-24 min-h-[40vh] border border-dashed border-zinc-800 rounded p-8 text-center text-textSecondary font-mono mt-12">
+          &gt; SYSTEM: [Razorpay Sponsor Wall will load here]
+        </div>
+
+        <div id="chat" className="pt-24 min-h-[60vh] border border-dashed border-zinc-800 rounded p-8 text-center text-textSecondary font-mono mt-12 mb-24">
+          &gt; SYSTEM: [AI Chatbot Terminal will load here]
+        </div>
+
+      </main>
     </div>
-  
-  )
+  );
 }
 
-export default App
+function App() {
+  return (
+    <Routes>
+      <Route path="/" element={<Portfolio />} />
+      <Route path="/sudo" element={<AdminDashboard />} />
+    </Routes>
+  );
+}
+
+export default App;
