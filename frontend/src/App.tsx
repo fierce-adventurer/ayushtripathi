@@ -7,6 +7,7 @@ import AdminDashboard from './components/AdminDashboard';
 import MetricsSection from './components/MetricsSection';
 import SponsorSection from './components/SponsorSection';
 import ChatModal from './components/ChatModal';
+import ContactSection from './components/ContactSection';
 
 // The Single Page Architecture Layout
 function Portfolio() {
@@ -37,7 +38,10 @@ function Portfolio() {
         {/* Section 5: Wall of Fame & Sponsorship */}
         <SponsorSection />
 
-        {/* Section 6: AI Chatbot Interface */}
+        {/* Section 6: Contact Form */}
+        <ContactSection />
+
+        {/* Section : AI Chatbot Interface */}
         <ChatModal />
 
       </main>
