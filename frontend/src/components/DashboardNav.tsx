@@ -6,7 +6,7 @@ const DashboardNav = () => {
         {/* Navigation Links */}
         <a href="#about" className="text-sm font-medium text-textSecondary hover:text-white transition-colors">~/about</a>
         <a href="#experience" className="text-sm font-medium text-textSecondary hover:text-white transition-colors">~/experience</a>
-        <a href="#grind" className="text-sm font-medium text-textSecondary hover:text-white transition-colors">~/grind</a>
+        <a href="#metrics" className="text-sm font-medium text-textSecondary hover:text-white transition-colors">~/metrics</a>
         <a href="#projects" className="text-sm font-medium text-textSecondary hover:text-white transition-colors">~/projects</a>
         <a href="#sponsor" className="text-sm font-medium text-accent hover:text-blue-400 transition-colors">~/sponsor_me</a>
         

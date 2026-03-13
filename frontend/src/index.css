@@ -1,7 +1,9 @@
 @import "tailwindcss";
+
 html {
   scroll-behavior: smooth;
 }
+
 @theme {
   /* Our AI Aesthetic Color Palette */
   --color-background: #09090b;
@@ -10,16 +12,21 @@ html {
   --color-textSecondary: #a1a1aa;
   --color-accent: #3b82f6;
 
-  /* The Blinking Cursor Animation */
+  /* Animations */
   --animate-cursor-blink: blink 1s step-end infinite;
+  --animate-infinite-scroll: infinite-scroll 25s linear infinite;
 
   @keyframes blink {
     0%, 100% { opacity: 1; }
     50% { opacity: 0; }
   }
+
+  @keyframes infinite-scroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); } /* Scrolls exactly half the width to seamlessly loop */
+  }
 }
 
-/* Apply the dark theme globally */
 @layer base {
   body {
     background-color: var(--color-background);
@@ -28,7 +35,6 @@ html {
     -webkit-font-smoothing: antialiased;
   }
   
-  /* Make highlighted text look electric */
   ::selection {
     background-color: var(--color-accent);
     color: #ffffff;

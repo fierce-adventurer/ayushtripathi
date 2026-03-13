@@ -1,9 +1,10 @@
 import { Routes, Route } from 'react-router-dom';
+import AboutSection from './components/AboutSection';
 import DashboardNav from './components/DashboardNav';
-import AgenticHero from './components/AgenticHero';
 import ExperienceSection from './components/ExperienceSection';
 import ProjectsSection from './components/ProjectsSection';
 import AdminDashboard from './components/AdminDashboard';
+import MetricsSection from './components/MetricsSection';
 
 // The Single Page Architecture Layout
 function Portfolio() {
@@ -13,11 +14,11 @@ function Portfolio() {
       <DashboardNav />
 
       {/* Main Content Wrapper - Centered for PC */}
-      <main className="max-w-4xl mx-auto px-8 pb-32">
+      <main className="max-w-5xl mx-auto px-8 pb-32">
         
         {/* Section 1: About (Hero) */}
         <div id="about" className="pt-32 min-h-[70vh] flex flex-col justify-center">
-          <AgenticHero />
+          <AboutSection />
         </div>
 
         {/* Section 2: Work Experience */}
@@ -27,6 +28,9 @@ function Portfolio() {
         <div id="projects" className="pt-24 min-h-[70vh]">
           <ProjectsSection />
         </div>
+
+        {/* Section 4: Live Metrics (LeetCode, CF, GitHub, LinkedIn, Resume) */}
+        <MetricsSection />
 
         {/* Placeholders for our next components */}
         <div id="grind" className="pt-24 min-h-[30vh] border border-dashed border-zinc-800 rounded p-8 text-center text-textSecondary font-mono mt-12">
