@@ -5,6 +5,7 @@ import ExperienceSection from './components/ExperienceSection';
 import ProjectsSection from './components/ProjectsSection';
 import AdminDashboard from './components/AdminDashboard';
 import MetricsSection from './components/MetricsSection';
+import SponsorSection from './components/SponsorSection';
 
 // The Single Page Architecture Layout
 function Portfolio() {
@@ -31,6 +32,9 @@ function Portfolio() {
 
         {/* Section 4: Live Metrics (LeetCode, CF, GitHub, LinkedIn, Resume) */}
         <MetricsSection />
+
+        {/* Section 5: Wall of Fame & Sponsorship */}
+        <SponsorSection />
 
         {/* Placeholders for our next components */}
         <div id="grind" className="pt-24 min-h-[30vh] border border-dashed border-zinc-800 rounded p-8 text-center text-textSecondary font-mono mt-12">

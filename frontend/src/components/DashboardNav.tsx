@@ -8,9 +8,16 @@ const DashboardNav = () => {
         <a href="#experience" className="text-sm font-medium text-textSecondary hover:text-white transition-colors">~/experience</a>
         <a href="#metrics" className="text-sm font-medium text-textSecondary hover:text-white transition-colors">~/metrics</a>
         <a href="#projects" className="text-sm font-medium text-textSecondary hover:text-white transition-colors">~/projects</a>
-        <a href="#sponsor" className="text-sm font-medium text-accent hover:text-blue-400 transition-colors">~/sponsor_me</a>
         
-        {/* The Chat Button (Styled like an executable) */}
+        {/* NEW: The Sponsor Button triggers the global modal event */}
+        <button 
+          onClick={() => window.dispatchEvent(new Event('open-payment-gateway'))}
+          className="text-sm font-medium text-accent hover:text-blue-400 transition-colors cursor-pointer"
+        >
+          ~/sponsor_me
+        </button>
+        
+        {/* The Chat Button */}
         <a 
           href="#chat" 
           className="ml-4 px-4 py-1.5 bg-accent/10 border border-accent/50 text-accent text-sm font-mono rounded-full hover:bg-accent hover:text-white transition-all"
