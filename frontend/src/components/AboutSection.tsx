@@ -1,14 +1,24 @@
 import AgenticHero from './AgenticHero';
 
 const AboutSection = () => {
-  // Updated to perfectly match the skills from your PDF Resume
-  const skills = [
-    "Java", "Spring Boot", "Microservices", "Kafka", "PostgreSQL", 
-    "MongoDB", "Docker", "Jenkins", "AWS", "Redis", 
-    "OAuth2", "JWT", "System Design", "Python", "C"
+  // Swapped C for React and Node.js (to complete the MERN stack) and added Go
+  const tools = [
+    { name: "Java", src: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/java/java-original.svg" },
+    { name: "Spring", src: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/spring/spring-original.svg" },
+    { name: "Docker", src: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/docker/docker-original.svg" },
+    { name: "Jenkins", src: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/jenkins/jenkins-original.svg" },
+    { name: "AWS", src: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/amazonwebservices/amazonwebservices-plain-wordmark.svg" },
+    { name: "Kafka", src: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/apachekafka/apachekafka-original.svg" },
+    { name: "Redis", src: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/redis/redis-original.svg" },
+    { name: "PostgreSQL", src: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/postgresql/postgresql-original.svg" },
+    { name: "MongoDB", src: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/mongodb/mongodb-original.svg" },
+    { name: "Python", src: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/python/python-original.svg" },
+    { name: "React", src: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/react/react-original.svg" },
+    { name: "Node.js", src: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/nodejs/nodejs-original.svg" },
+    { name: "Go", src: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/go/go-original.svg" }
   ];
 
-  const duplicatedSkills = [...skills, ...skills];
+  const duplicatedTools = [...tools, ...tools, ...tools]; // Tripled to ensure a seamless infinite scroll
 
   return (
     <div id="about" className="pt-32 min-h-[80vh] flex flex-col justify-center">
@@ -43,19 +53,23 @@ const AboutSection = () => {
 
       </div>
 
-      {/* Bottom Half: The Monochrome Infinite Skills Marquee */}
-      <div className="w-full overflow-hidden relative border-y border-zinc-800/50 py-6 bg-zinc-950/30">
-        <div className="absolute inset-y-0 left-0 w-16 sm:w-32 bg-gradient-to-r from-background to-transparent z-10"></div>
-        <div className="absolute inset-y-0 right-0 w-16 sm:w-32 bg-gradient-to-l from-background to-transparent z-10"></div>
+      {/* Bottom Half: The Monochrome-to-Color Infinite Tool Marquee */}
+      <div className="w-full overflow-hidden relative border-y border-zinc-800/50 py-8 bg-zinc-950/30">
+        <div className="absolute inset-y-0 left-0 w-16 sm:w-32 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none"></div>
+        <div className="absolute inset-y-0 right-0 w-16 sm:w-32 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none"></div>
         
-        <div className="flex w-max animate-infinite-scroll hover:[animation-play-state:paused]">
-          {duplicatedSkills.map((skill, index) => (
-            <div key={index} className="flex items-center mx-4 sm:mx-8 gap-2 group">
-              <span className="text-zinc-600 font-mono text-sm">&lt;</span>
-              <span className="text-zinc-400 font-mono font-medium whitespace-nowrap group-hover:text-white transition-colors">
-                {skill}
+        <div className="flex w-max animate-infinite-scroll hover:[animation-play-state:paused] items-center">
+          {duplicatedTools.map((tool, index) => (
+            <div key={index} className="flex items-center mx-6 sm:mx-10 gap-3 group cursor-pointer">
+              <img 
+                src={tool.src} 
+                alt={tool.name} 
+                // {/* UPDATED: Increased width and height by 25% */}
+                className="w-10 h-10 md:w-[50px] md:h-[50px] object-contain grayscale opacity-50 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-300"
+              />
+              <span className="text-zinc-500 font-mono text-sm md:text-base group-hover:text-white transition-colors whitespace-nowrap">
+                {tool.name}
               </span>
-              <span className="text-zinc-600 font-mono text-sm">/&gt;</span>
             </div>
           ))}
         </div>
