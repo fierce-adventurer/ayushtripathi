@@ -112,7 +112,7 @@ const MetricsSection = () => {
         </a>
 
         {/* Resume Node */}
-        <a href="/profile.jpg" download className="group flex flex-col items-center justify-center p-6 bg-zinc-950 border border-zinc-800 rounded-2xl hover:border-white transition-all duration-300">
+        <a href="https://drive.google.com/file/d/1mkDrr9xYSplGzt3btQkSZnR-FzJvXJgq/view?usp=drive_link" target="_blank" rel="noreferrer" className="group flex flex-col items-center justify-center p-6 bg-zinc-950 border border-zinc-800 rounded-2xl hover:border-white transition-all duration-300">
           <FileDown className="w-7 h-7 text-zinc-500 group-hover:text-white mb-3 transition-colors" />
           <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Payload</span>
           <span className="text-sm font-mono text-white">Resume.pdf</span>
