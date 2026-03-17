@@ -174,7 +174,7 @@ const SponsorSection = () => {
             <form onSubmit={handlePayment} className="flex flex-col gap-4">
               <div>
                 <label className="block text-xs font-mono text-textSecondary mb-1">Display Name</label>
-                <input type="text" value={sponsorName} onChange={(e) => setSponsorName(e.target.value)} placeholder="Hacker_99" className="w-full bg-background border border-zinc-800 text-white p-3 rounded-md focus:border-accent text-sm" required />
+                <input type="text" value={sponsorName} onChange={(e) => setSponsorName(e.target.value)} placeholder="Your Name" className="w-full bg-background border border-zinc-800 text-white p-3 rounded-md focus:border-accent text-sm" required />
               </div>
               <div>
                 <label className="block text-xs font-mono text-textSecondary mb-1">Email Address</label>
