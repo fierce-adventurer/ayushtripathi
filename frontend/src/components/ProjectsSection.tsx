@@ -10,11 +10,12 @@ const ProjectsSection = () => {
   
   // State to control the Expanded Modal
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
 
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const response = await axios.get('http://localhost:8080/api/projects');
+        const response = await axios.get(`${API_URL}/api/projects`);
         setProjects(response.data);
       } catch (err) {
         console.error(err);

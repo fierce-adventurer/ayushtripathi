@@ -18,12 +18,13 @@ const SponsorSection = () => {
   const [email, setEmail] = useState('');
   const [amount, setAmount] = useState(500);
   const [isProcessing, setIsProcessing] = useState(false);
+  const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
 
   // Fetch Sponsors on Load
   useEffect(() => {
     const fetchSponsors = async () => {
       try {
-        const response = await axios.get('http://localhost:8080/api/sponsors');
+        const response = await axios.get(`${API_URL}/api/sponsors`);
         setSponsors(response.data);
       } catch (err) {
         console.error("Failed to fetch sponsors", err);

@@ -13,6 +13,9 @@ const AdminDashboard = () => {
   const [githubUrl, setGithubUrl] = useState('');
   const [liveUrl, setLiveUrl] = useState('');
 
+  // Use an environment variable with a fallback
+  const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
+
   // Delete project state
   const [deleteId, setDeleteId] = useState('');
 
@@ -41,7 +44,7 @@ const AdminDashboard = () => {
     setStatus('Uploading project...');
     try {
       await axios.post(
-        'http://localhost:8080/api/admin/projects',
+        `${API_URL}/api/admin/projects`,
         { title, description, techStack, githubUrl, liveUrl },
         { headers: { 'X-Admin-Secret': secretKey } }
       );
@@ -63,7 +66,7 @@ const AdminDashboard = () => {
     
     setStatus('Deleting project...');
     try {
-      await axios.delete(`http://localhost:8080/api/admin/projects/${deleteId.trim()}`, {
+      await axios.delete(`${API_URL}/api/admin/projects/${deleteId.trim()}`, {
         headers: { 'X-Admin-Secret': secretKey }
       });
       setStatus('Project successfully deleted!');
@@ -88,7 +91,7 @@ const AdminDashboard = () => {
     formData.append('file', file);
 
     try {
-      await axios.post('http://localhost:8080/api/admin/ingest', formData, {
+      await axios.post(`${API_URL}/api/admin/ingest`, formData, {
         headers: {
           'X-Admin-Secret': secretKey,
           'Content-Type': 'multipart/form-data'

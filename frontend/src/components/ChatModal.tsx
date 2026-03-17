@@ -87,6 +87,7 @@ const ChatModal = () => {
       content: "Hello! I have complete access to Ayush's resume, tech stack, and project architecture. How can I help you today?"
     }
   ]);
+  const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   
@@ -123,7 +124,7 @@ const ChatModal = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch('http://localhost:8080/api/chat', {
+      const response = await fetch(`${API_URL}/api/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ question: userQuery })
