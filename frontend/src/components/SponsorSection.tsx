@@ -18,7 +18,7 @@ const SponsorSection = () => {
   const [email, setEmail] = useState('');
   const [amount, setAmount] = useState(500);
   const [isProcessing, setIsProcessing] = useState(false);
-  const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
+  const API_URL = import.meta.env.VITE_API_BASE_URL ;
 
   // Fetch Sponsors on Load
   useEffect(() => {
