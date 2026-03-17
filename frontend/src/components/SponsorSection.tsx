@@ -168,7 +168,7 @@ const SponsorSection = () => {
             <button onClick={() => setIsModalOpen(false)} className="absolute top-4 right-4 text-textSecondary hover:text-white"><X className="w-5 h-5" /></button>
             <div className="flex flex-col items-center mb-6">
               <div className="w-12 h-12 bg-accent/20 rounded-full flex items-center justify-center mb-4"><Zap className="w-6 h-6 text-accent" /></div>
-              <h3 className="text-xl font-bold text-white">Support the Build</h3>
+              <h3 className="text-xl font-bold text-white">Support the Code</h3>
               <p className="text-xs text-textSecondary font-mono mt-2 text-center">Initialize secure connection to payment gateway.</p>
             </div>
             <form onSubmit={handlePayment} className="flex flex-col gap-4">
