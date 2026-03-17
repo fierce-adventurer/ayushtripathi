@@ -2,15 +2,23 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Github, Linkedin, Code2, Terminal, FileDown, Activity, Loader2 } from 'lucide-react';
 
+// 1. ADDED: The interface defining the exact shape and allowed types for our state
+interface StatsState {
+  leetcode: { solved: string | number | null; loading: boolean; };
+  codeforces: { rating: string | number | null; loading: boolean; };
+  github: { repos: string | number | null; loading: boolean; };
+}
+
 const MetricsSection = () => {
-  const [stats, setStats] = useState({
+  // 2. ADDED: Attached the <StatsState> interface to the hook
+  const [stats, setStats] = useState<StatsState>({
     leetcode: { solved: null, loading: true },
     codeforces: { rating: null, loading: true },
     github: { repos: null, loading: true }
   });
 
   useEffect(() => {
-    // 1. GitHub: Real-time Repository Count (With Headers & Rate Limit Handling)
+    // 1. GitHub: Real-time Repository Count
     axios.get('https://api.github.com/users/fierce-adventurer', {
       headers: {
         'Accept': 'application/vnd.github.v3+json'
@@ -25,7 +33,6 @@ const MetricsSection = () => {
       })
       .catch(err => {
         console.error("GitHub Fetch Error:", err.response || err);
-        // Detect if GitHub blocked the request due to the 60 requests/hr limit
         const isRateLimit = err.response && (err.response.status === 403 || err.response.status === 429);
         setStats(s => ({ ...s, github: { repos: isRateLimit ? 'Limit Hit' : 'Err', loading: false } }));
       });
@@ -97,7 +104,7 @@ const MetricsSection = () => {
         </a>
 
         {/* LinkedIn Node */}
-        <a href="https://www.linkedin.com/in/ayush-tripathi" target="_blank" rel="noreferrer" className="group flex flex-col items-center justify-center p-6 bg-zinc-950 border border-zinc-800 rounded-2xl hover:border-white transition-all duration-300">
+        <a href="https://www.linkedin.com/in/ayush-tripathi-89265923a/" target="_blank" rel="noreferrer" className="group flex flex-col items-center justify-center p-6 bg-zinc-950 border border-zinc-800 rounded-2xl hover:border-white transition-all duration-300">
           <Linkedin className="w-7 h-7 text-zinc-500 group-hover:text-white mb-3 transition-colors" />
           <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Connect</span>
           <span className="text-sm font-mono text-white">LinkedIn</span>
