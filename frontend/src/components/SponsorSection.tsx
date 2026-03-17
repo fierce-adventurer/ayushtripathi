@@ -184,7 +184,8 @@ const SponsorSection = () => {
                 <label className="block text-xs font-mono text-textSecondary mb-1">Amount (INR)</label>
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-textSecondary font-mono">₹</span>
-                  <input type="number" min="100" value={amount} onChange={(e) => setAmount(Number(e.target.value))} className="w-full bg-background border border-zinc-800 text-white p-3 pl-8 rounded-md focus:border-accent text-sm" required />
+                  {/* ---> REMOVED min="100" from this input field <--- */}
+                  <input type="number" value={amount} onChange={(e) => setAmount(Number(e.target.value))} className="w-full bg-background border border-zinc-800 text-white p-3 pl-8 rounded-md focus:border-accent text-sm" required />
                 </div>
               </div>
               <button type="submit" disabled={isProcessing} className="w-full mt-4 bg-white text-black font-bold py-3 rounded-md hover:bg-gray-200 disabled:opacity-50">
