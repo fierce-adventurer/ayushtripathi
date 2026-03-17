@@ -2,6 +2,18 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Award, Terminal, X, Zap } from 'lucide-react';
 
+// ---> ADDED: Helper function to load the external Razorpay script <---
+const loadScript = (src: string) => {
+  return new Promise((resolve) => {
+    const script = document.createElement('script');
+    script.src = src;
+    script.onload = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
+};
+// -------------------------------------------------------------------
+
 interface Sponsor {
   sponsorName: string;
   amount: number;
@@ -18,7 +30,7 @@ const SponsorSection = () => {
   const [email, setEmail] = useState('');
   const [amount, setAmount] = useState(500);
   const [isProcessing, setIsProcessing] = useState(false);
-  const API_URL = import.meta.env.VITE_API_BASE_URL ;
+  const API_URL = import.meta.env.VITE_API_BASE_URL;
 
   // Fetch Sponsors on Load
   useEffect(() => {
@@ -54,23 +66,78 @@ const SponsorSection = () => {
     return () => { document.body.style.overflow = 'unset'; };
   }, [isModalOpen]);
 
-  // Handle the Payment Initiation
+  // ---> MODIFIED: The handlePayment function now actually connects to your backend and Razorpay <---
   const handlePayment = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsProcessing(true);
 
     try {
-      // Razorpay logic will go here
-      setTimeout(() => {
-        console.log("Processing payment for:", sponsorName, amount);
+      // 1. Load the Razorpay Script
+      const res = await loadScript('https://checkout.razorpay.com/v1/checkout.js');
+      if (!res) {
+        alert('Razorpay SDK failed to load. Are you online?');
         setIsProcessing(false);
-        setIsModalOpen(false); // Close on success
-      }, 1500);
+        return;
+      }
+
+      // 2. Ask your Spring Boot backend to create an Order ID
+      // Make sure you have a controller mapped to POST /api/payments/create-order
+      const orderResponse = await axios.post(`${API_URL}/api/payments/create-order`, {
+        amount: amount,
+        currency: "INR",
+        sponsorName: sponsorName,
+        email: email
+      });
+
+      // 3. Configure the Razorpay Pop-up window
+      const options = {
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID, // ADD THIS TO YOUR VERCEL ENV VARIABLES
+        amount: orderResponse.data.amount, // Amount in paise from your backend
+        currency: orderResponse.data.currency,
+        name: "Fierce Adventurer Portfolio",
+        description: "Sponsor the Build",
+        order_id: orderResponse.data.id, // The Razorpay Order ID your backend generated
+        handler: function (response: any) {
+            // This code runs when the user successfully pays
+            console.log("Payment Successful on Frontend!", response);
+            setIsModalOpen(false);
+            alert("Thank you for your support! Your name will appear on the Wall of Fame shortly.");
+            // Razorpay will simultaneously ping your backend WebhookController!
+        },
+        prefill: {
+            name: sponsorName,
+            email: email,
+        },
+        notes: {
+            // IMPORTANT: This matches exactly what your WebhookController is looking for
+            sponsor_name: sponsorName 
+        },
+        theme: {
+            color: "#10b981" // Tailwind emerald/accent color
+        }
+      };
+
+      // 4. Open the Razorpay window
+      // We use (window as any) to bypass TypeScript not knowing about the Razorpay object
+      const paymentObject = new (window as any).Razorpay(options);
+      
+      paymentObject.on('payment.failed', function (response: any) {
+        console.error("Payment Failed", response.error);
+        alert("Payment failed or was cancelled.");
+        setIsProcessing(false);
+      });
+
+      paymentObject.open();
+
     } catch (error) {
       console.error("Payment initiation failed", error);
-      setIsProcessing(false);
+      alert("Could not connect to the backend to create an order.");
+    } finally {
+      // Keep button disabled if modal is open but reset it if an error occurred
+      setIsProcessing(false); 
     }
   };
+  // ---------------------------------------------------------------------------------------------
 
   // If we are still fetching data, render absolutely nothing to prevent UI flashes
   if (loading) return null;
@@ -78,7 +145,6 @@ const SponsorSection = () => {
   return (
     <>
       {/* --- CONDITIONAL WALL OF FAME --- */}
-      {/* Only renders into the DOM if the database has at least 1 sponsor */}
       {sponsors.length > 0 && (
         <div id="sponsor" className="w-full pt-24 min-h-[40vh]">
           <div className="flex items-center gap-3 mb-12">
@@ -100,8 +166,7 @@ const SponsorSection = () => {
         </div>
       )}
 
-      {/* --- PAYMENT MODAL (Centered Square Overlay) --- */}
-      {/* This can open regardless of whether the Wall of Fame is visible or not */}
+      {/* --- PAYMENT MODAL --- */}
       {isModalOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
           <div className="absolute inset-0 cursor-pointer" onClick={() => setIsModalOpen(false)}></div>

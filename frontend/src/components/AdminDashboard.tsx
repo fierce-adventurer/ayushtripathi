@@ -14,7 +14,7 @@ const AdminDashboard = () => {
   const [liveUrl, setLiveUrl] = useState('');
 
   // Use an environment variable with a fallback
-  const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
+  const API_URL = import.meta.env.VITE_API_BASE_URL ;
 
   // Delete project state
   const [deleteId, setDeleteId] = useState('');
