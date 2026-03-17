@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Github, Linkedin, Code2, Terminal, FileDown, Activity, Loader2 } from 'lucide-react';
 
-// 1. ADDED: The interface defining the exact shape and allowed types for our state
+// MUST KEEP THIS: Prevents the TypeScript deployment crash
 interface StatsState {
   leetcode: { solved: string | number | null; loading: boolean; };
   codeforces: { rating: string | number | null; loading: boolean; };
@@ -10,7 +10,7 @@ interface StatsState {
 }
 
 const MetricsSection = () => {
-  // 2. ADDED: Attached the <StatsState> interface to the hook
+  // Attached the interface here
   const [stats, setStats] = useState<StatsState>({
     leetcode: { solved: null, loading: true },
     codeforces: { rating: null, loading: true },
@@ -48,11 +48,12 @@ const MetricsSection = () => {
         setStats(s => ({ ...s, codeforces: { rating: 'Err', loading: false } }));
       });
 
-    // 3. LeetCode: Real-time Solved Count
-    axios.get('https://alfa-leetcode-api.onrender.com/ayushtripathi2005/solved')
+    // 3. LeetCode: Real-time Solved Count (SWITCHED TO FAST VERCEL API)
+    axios.get('https://leetcode-api-faisalshohag.vercel.app/ayushtripathi2005')
       .then(res => {
-        if (res.data && typeof res.data.solvedProblem === 'number') {
-          setStats(s => ({ ...s, leetcode: { solved: res.data.solvedProblem, loading: false } }));
+        // This API returns "totalSolved" instead of "solvedProblem"
+        if (res.data && typeof res.data.totalSolved === 'number') {
+          setStats(s => ({ ...s, leetcode: { solved: res.data.totalSolved, loading: false } }));
         } else {
           throw new Error('Structure Mismatch');
         }
@@ -104,7 +105,7 @@ const MetricsSection = () => {
         </a>
 
         {/* LinkedIn Node */}
-        <a href="https://www.linkedin.com/in/ayush-tripathi-89265923a/" target="_blank" rel="noreferrer" className="group flex flex-col items-center justify-center p-6 bg-zinc-950 border border-zinc-800 rounded-2xl hover:border-white transition-all duration-300">
+        <a href="https://www.linkedin.com/in/ayush-tripathi" target="_blank" rel="noreferrer" className="group flex flex-col items-center justify-center p-6 bg-zinc-950 border border-zinc-800 rounded-2xl hover:border-white transition-all duration-300">
           <Linkedin className="w-7 h-7 text-zinc-500 group-hover:text-white mb-3 transition-colors" />
           <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Connect</span>
           <span className="text-sm font-mono text-white">LinkedIn</span>
