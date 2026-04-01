@@ -129,11 +129,14 @@ const SponsorSection = () => {
             {sponsors.map((sponsor, index) => (
               <div key={index} className="bg-surface border border-zinc-800 rounded-lg p-3 sm:p-4 flex flex-col items-center justify-center text-center hover:border-zinc-600 transition-colors w-full min-w-0">
                 <Terminal className="w-5 h-5 sm:w-6 sm:h-6 text-textSecondary mb-2 shrink-0" />
-                {/* Added break-all to prevent long names from snapping the card width */}
                 <span className="text-white font-medium text-xs sm:text-sm line-clamp-1 break-all">{sponsor.sponsorName}</span>
-                <span className="text-accent font-mono text-[10px] sm:text-xs mt-1">
-                  {sponsor.currency} {sponsor.amount}
-                </span>
+                
+                {/* FIX: Replaced standard span with a flex container and gap-1.5 to strictly enforce spacing */}
+                <div className="flex items-center gap-1.5 text-accent font-mono text-[10px] sm:text-xs mt-1.5">
+                  <span>{sponsor.currency}</span>
+                  <span>{sponsor.amount.toLocaleString()}</span>
+                </div>
+
               </div>
             ))}
           </div>
@@ -144,7 +147,6 @@ const SponsorSection = () => {
       {isModalOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
           <div className="absolute inset-0 cursor-pointer" onClick={() => setIsModalOpen(false)}></div>
-          {/* CRITICAL FIX: w-[380px] changed to w-full max-w-md */}
           <div className="relative w-full max-w-md bg-surface border border-zinc-700 rounded-xl shadow-2xl p-6 sm:p-8 z-10 max-h-[90vh] overflow-y-auto">
             <button onClick={() => setIsModalOpen(false)} className="absolute top-3 sm:top-4 right-3 sm:right-4 text-textSecondary hover:text-white bg-surface p-1 rounded-md"><X className="w-5 h-5" /></button>
             <div className="flex flex-col items-center mb-6 mt-2">
