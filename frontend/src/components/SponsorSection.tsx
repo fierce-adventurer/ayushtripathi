@@ -166,8 +166,14 @@ const SponsorSection = () => {
               <div>
                 <label className="block text-[10px] sm:text-xs font-mono text-textSecondary mb-1">Amount (INR)</label>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-textSecondary font-mono text-sm">₹</span>
-                  <input type="number" value={amount} onChange={(e) => setAmount(Number(e.target.value))} className="w-full bg-background border border-zinc-800 text-white p-2.5 sm:p-3 pl-8 rounded-md focus:border-accent text-xs sm:text-sm" required />
+                  <span className="absolute left-4 text-zinc-500 font-mono text-sm pointer-events-none">₹</span>
+                  <input 
+                    type="number" 
+                    value={amount} 
+                    onChange={(e) => setAmount(Number(e.target.value))} 
+                    className="w-full bg-background border border-zinc-800 text-white py-2.5 sm:py-3 pr-3 pl-10 rounded-md focus:border-accent text-xs sm:text-sm" 
+                    required 
+                  />
                 </div>
               </div>
               <button type="submit" disabled={isProcessing} className="w-full mt-2 sm:mt-4 bg-white text-black font-bold py-2.5 sm:py-3 rounded-md hover:bg-gray-200 disabled:opacity-50 text-sm sm:text-base">
