@@ -27,7 +27,7 @@ function Portfolio() {
         <ExperienceSection />
 
         {/* Section 3: Projects */}
-        <div id="projects" className="pt-24 min-h-[70vh]">
+        <div id="projects" className="pt-24 mb-8">
           <ProjectsSection />
         </div>
 
