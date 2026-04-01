@@ -12,17 +12,16 @@ import ContactSection from './components/ContactSection';
 // The Single Page Architecture Layout
 function Portfolio() {
   return (
-    <div className="relative min-h-screen bg-background text-textPrimary selection:bg-accent selection:text-white">
-      {/* Floating Top Nav */}
+    <div className="relative min-h-screen overflow-x-hidden bg-background text-textPrimary selection:bg-accent selection:text-white">
       <DashboardNav />
 
       {/* Main Content Wrapper - Centered for PC */}
-      <main className="max-w-5xl mx-auto px-8 pb-32">
+      <main className="max-w-5xl mx-auto px-4 sm:px-8 pb-32">
         
         {/* Section 1: About (Hero) */}
-        <div id="about" className="pt-32 min-h-[70vh] flex flex-col justify-center">
-          <AboutSection />
-        </div>
+        
+        <AboutSection />
+        
 
         {/* Section 2: Work Experience */}
         <ExperienceSection />

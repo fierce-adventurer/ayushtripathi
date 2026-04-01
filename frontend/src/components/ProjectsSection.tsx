@@ -1,192 +1,182 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { ExternalLink, Github, FolderGit2, X, TerminalSquare } from 'lucide-react';
-import type { Project } from '../types';
+import { Award, Terminal, X, Zap } from 'lucide-react';
 
-const ProjectsSection = () => {
-  const [projects, setProjects] = useState<Project[]>([]);
+const loadRazorpayScript = () => {
+  return new Promise((resolve) => {
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.async = true;
+    script.onload = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
+};
+
+interface Sponsor {
+  sponsorName: string;
+  amount: number;
+  currency: string;
+}
+
+const SponsorSection = () => {
+  const [sponsors, setSponsors] = useState<Sponsor[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
   
-  // State to control the Expanded Modal
-  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [sponsorName, setSponsorName] = useState('');
+  const [email, setEmail] = useState('');
+  const [amount, setAmount] = useState(500);
+  const [isProcessing, setIsProcessing] = useState(false);
+  
   const API_URL = import.meta.env.VITE_API_BASE_URL;
+  const RAZORPAY_KEY = import.meta.env.VITE_RAZORPAY_KEY_ID;
 
   useEffect(() => {
-    const fetchProjects = async () => {
+    const fetchSponsors = async () => {
       try {
-        const response = await axios.get(`${API_URL}/api/projects`);
-        setProjects(response.data);
+        const response = await axios.get(`${API_URL}/api/sponsors`);
+        setSponsors(response.data);
       } catch (err) {
-        console.error(err);
-        setError('Failed to establish connection to the backend database.');
+        console.error("Failed to fetch sponsors", err);
       } finally {
         setLoading(false);
       }
     };
+    fetchSponsors();
+  }, [API_URL]);
 
-    fetchProjects();
+  useEffect(() => {
+    const handleOpenModal = () => setIsModalOpen(true);
+    window.addEventListener('open-payment-gateway', handleOpenModal);
+    return () => window.removeEventListener('open-payment-gateway', handleOpenModal);
   }, []);
 
-  // Prevent background scrolling when modal is open
-  useEffect(() => {
-    if (selectedProject) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
+  const handlePayment = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsProcessing(true);
+
+    try {
+      if (!RAZORPAY_KEY) {
+        throw new Error("VITE_RAZORPAY_KEY_ID is missing in Vercel environment variables.");
+      }
+
+      const isLoaded = await loadRazorpayScript();
+      if (!isLoaded) {
+        throw new Error("Razorpay SDK failed to load. Check your internet connection.");
+      }
+
+      const { data: order } = await axios.post(`${API_URL}/api/payments/create-order`, {
+        amount: amount, 
+        currency: "INR",
+        sponsorName: sponsorName,
+        email: email
+      });
+
+      const options = {
+        key: RAZORPAY_KEY,
+        amount: order.amount, 
+        currency: order.currency,
+        name: "Fierce Adventurer",
+        description: "Portfolio Sponsorship",
+        image: "https://your-domain.com/logo.png", 
+        order_id: order.id, 
+        handler: function (response: any) {
+          alert(`Success! Payment ID: ${response.razorpay_payment_id}`);
+          setIsModalOpen(false);
+          setSponsorName('');
+          setEmail('');
+        },
+        prefill: {
+          name: sponsorName,
+          email: email,
+        },
+        notes: {
+          sponsor_name: sponsorName 
+        },
+        theme: {
+          color: "#10b981", 
+        },
+      };
+
+      const rzp = new (window as any).Razorpay(options);
+      
+      rzp.on('payment.failed', function (response: any) {
+        alert(`Payment Failed: ${response.error.description}`);
+      });
+
+      rzp.open();
+
+    } catch (error: any) {
+      const errorMsg = error.response?.data?.message || error.message || "Unknown Error";
+      alert(`Error: ${errorMsg}`);
+    } finally {
+      setIsProcessing(false);
     }
-    return () => { document.body.style.overflow = 'unset'; };
-  }, [selectedProject]);
+  };
 
-  if (loading) {
-    return (
-      <div className="w-full pt-24 font-mono text-textSecondary text-sm animate-pulse">
-        &gt; SYSTEM: Fetching projects from secure database...
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="w-full pt-24 font-mono text-red-500 text-sm">
-        &gt; ERROR: {error}
-      </div>
-    );
-  }
+  if (loading) return null;
 
   return (
-    <div id="projects" className="w-full pt-24 min-h-[60vh] relative">
-      <div className="flex items-center justify-between mb-8">
-        <div className="flex items-center gap-3">
-          <FolderGit2 className="w-6 h-6 text-accent" />
-          <h2 className="text-2xl font-bold text-textPrimary tracking-tight">Deployed_Modules</h2>
+    <>
+      {sponsors.length > 0 && (
+        <div id="sponsor" className="w-full pt-20 sm:pt-24 min-h-[40vh]">
+          <div className="flex items-center gap-2 sm:gap-3 mb-8 sm:mb-12">
+            <Award className="w-5 h-5 sm:w-6 sm:h-6 text-accent shrink-0" />
+            <h2 className="text-xl sm:text-2xl font-bold text-textPrimary tracking-tight">Wall_of_Fame</h2>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4 w-full">
+            {sponsors.map((sponsor, index) => (
+              <div key={index} className="bg-surface border border-zinc-800 rounded-lg p-3 sm:p-4 flex flex-col items-center justify-center text-center hover:border-zinc-600 transition-colors w-full min-w-0">
+                <Terminal className="w-5 h-5 sm:w-6 sm:h-6 text-textSecondary mb-2 shrink-0" />
+                {/* Added break-all to prevent long names from snapping the card width */}
+                <span className="text-white font-medium text-xs sm:text-sm line-clamp-1 break-all">{sponsor.sponsorName}</span>
+                <span className="text-accent font-mono text-[10px] sm:text-xs mt-1">
+                  {sponsor.currency} {sponsor.amount}
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
-        <span className="text-xs text-textSecondary font-mono hidden sm:block">
-          [ SCROLL HORIZONTALLY ]
-        </span>
-      </div>
+      )}
 
-      {/* Horizontal Scroll Container */}
-      <div className="flex overflow-x-auto gap-6 pb-8 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-        {projects.map((project) => (
-          <div 
-            key={project.id} 
-            // HERE IS THE FIX: Strict square dimensions (320px by 320px) 
-            className="group flex flex-col w-[300px] h-[300px] sm:w-[320px] sm:h-[320px] shrink-0 snap-center bg-surface border border-zinc-800 rounded-xl p-6 hover:border-accent transition-all duration-300 hover:shadow-[0_0_20px_rgba(59,130,246,0.1)]"
-          >
-            {/* Title clamped to 1 line so it doesn't break the square */}
-            <h3 className="text-xl font-semibold text-textPrimary mb-2 group-hover:text-accent transition-colors line-clamp-1">
-              {project.title}
-            </h3>
-            
-            {/* Description strictly clamped to 3 lines */}
-            <p className="text-textSecondary text-sm leading-relaxed mb-4 line-clamp-3">
-              {project.description}
-            </p>
-
-            {/* Tech Stack tags (hidden if they overflow the box) */}
-            <div className="flex flex-wrap gap-2 mb-2 overflow-hidden max-h-[60px]">
-              {project.techStack.split(',').slice(0, 3).map((tech, index) => (
-                <span key={index} className="px-2 py-1 text-xs font-mono text-textSecondary bg-background border border-zinc-800 rounded-md whitespace-nowrap">
-                  {tech.trim()}
-                </span>
-              ))}
-              {project.techStack.split(',').length > 3 && (
-                <span className="px-2 py-1 text-xs font-mono text-textSecondary bg-background border border-zinc-800 rounded-md">
-                  +{project.techStack.split(',').length - 3}
-                </span>
-              )}
+      {/* Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+          <div className="absolute inset-0 cursor-pointer" onClick={() => setIsModalOpen(false)}></div>
+          {/* CRITICAL FIX: w-[380px] changed to w-full max-w-md */}
+          <div className="relative w-full max-w-md bg-surface border border-zinc-700 rounded-xl shadow-2xl p-6 sm:p-8 z-10 max-h-[90vh] overflow-y-auto">
+            <button onClick={() => setIsModalOpen(false)} className="absolute top-3 sm:top-4 right-3 sm:right-4 text-textSecondary hover:text-white bg-surface p-1 rounded-md"><X className="w-5 h-5" /></button>
+            <div className="flex flex-col items-center mb-6 mt-2">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-accent/20 rounded-full flex items-center justify-center mb-3 sm:mb-4 shrink-0"><Zap className="w-5 h-5 sm:w-6 sm:h-6 text-accent" /></div>
+              <h3 className="text-lg sm:text-xl font-bold text-white text-center">Support the Code</h3>
+              <p className="text-[10px] sm:text-xs text-textSecondary font-mono mt-1 sm:mt-2 text-center">Initialize secure connection to payment gateway.</p>
             </div>
-
-            {/* mt-auto forces this button to the absolute bottom of the square */}
-            <div className="mt-auto pt-4 border-t border-zinc-800/50 flex items-center justify-between">
-              <button 
-                onClick={() => setSelectedProject(project)}
-                className="flex items-center gap-2 text-sm text-accent hover:text-blue-400 font-mono transition-colors"
-              >
-                <TerminalSquare className="w-4 h-4" />
-                <span>[ READ_SPEC ]</span>
+            <form onSubmit={handlePayment} className="flex flex-col gap-3 sm:gap-4 w-full">
+              <div>
+                <label className="block text-[10px] sm:text-xs font-mono text-textSecondary mb-1">Display Name</label>
+                <input type="text" value={sponsorName} onChange={(e) => setSponsorName(e.target.value)} placeholder="Your Name" className="w-full bg-background border border-zinc-800 text-white p-2.5 sm:p-3 rounded-md focus:border-accent text-xs sm:text-sm" required />
+              </div>
+              <div>
+                <label className="block text-[10px] sm:text-xs font-mono text-textSecondary mb-1">Email Address</label>
+                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="contact@domain.com" className="w-full bg-background border border-zinc-800 text-white p-2.5 sm:p-3 rounded-md focus:border-accent text-xs sm:text-sm" required />
+              </div>
+              <div>
+                <label className="block text-[10px] sm:text-xs font-mono text-textSecondary mb-1">Amount (INR)</label>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-textSecondary font-mono text-sm">₹</span>
+                  <input type="number" value={amount} onChange={(e) => setAmount(Number(e.target.value))} className="w-full bg-background border border-zinc-800 text-white p-2.5 sm:p-3 pl-8 rounded-md focus:border-accent text-xs sm:text-sm" required />
+                </div>
+              </div>
+              <button type="submit" disabled={isProcessing} className="w-full mt-2 sm:mt-4 bg-white text-black font-bold py-2.5 sm:py-3 rounded-md hover:bg-gray-200 disabled:opacity-50 text-sm sm:text-base">
+                {isProcessing ? 'Establishing Link...' : 'Proceed to Checkout'}
               </button>
-            </div>
-          </div>
-        ))}
-      </div>
-      
-      {/* Empty State Fallback */}
-      {projects.length === 0 && !loading && !error && (
-        <div className="w-full font-mono text-textSecondary text-sm border border-dashed border-zinc-800 rounded-lg p-8 text-center">
-          &gt; SYSTEM: No modules detected in active memory.
-        </div>
-      )}
-
-      {/* --- EXPANDED PROJECT MODAL --- */}
-      {selectedProject && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-8 bg-black/80 backdrop-blur-sm">
-          {/* Modal Background Click to Close */}
-          <div 
-            className="absolute inset-0 cursor-pointer" 
-            onClick={() => setSelectedProject(null)}
-          ></div>
-          
-          {/* Modal Content Box */}
-          <div className="relative w-full max-w-2xl bg-surface border border-zinc-700 rounded-xl shadow-2xl p-6 sm:p-10 max-h-[90vh] overflow-y-auto [&::-webkit-scrollbar]:hidden">
-            
-            {/* Close Button */}
-            <button 
-              onClick={() => setSelectedProject(null)}
-              className="absolute top-4 right-4 p-2 bg-background border border-zinc-800 rounded-md text-textSecondary hover:text-white hover:border-red-500 transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
-
-            <h2 className="text-3xl font-bold text-white mb-4 pr-8">{selectedProject.title}</h2>
-            
-            <div className="flex flex-wrap gap-2 mb-8">
-              {selectedProject.techStack.split(',').map((tech, index) => (
-                <span key={index} className="px-3 py-1.5 text-xs font-mono text-accent bg-accent/10 border border-accent/20 rounded-md">
-                  {tech.trim()}
-                </span>
-              ))}
-            </div>
-
-            <div className="mb-8">
-              <h4 className="text-xs font-mono text-textSecondary mb-2 uppercase tracking-wider">Module Description</h4>
-              {/* Full description rendering naturally */}
-              <p className="text-textPrimary text-base leading-relaxed whitespace-pre-wrap">
-                {selectedProject.description}
-              </p>
-            </div>
-
-            {/* Links at the bottom of Modal */}
-            <div className="flex items-center gap-6 pt-6 border-t border-zinc-800">
-              {selectedProject.githubUrl && (
-                <a 
-                  href={selectedProject.githubUrl} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 text-sm font-medium text-white hover:text-accent transition-colors"
-                >
-                  <Github className="w-5 h-5" />
-                  <span>View Source Code</span>
-                </a>
-              )}
-              {selectedProject.liveUrl && (
-                <a 
-                  href={selectedProject.liveUrl} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 text-sm font-medium text-accent hover:text-blue-400 transition-colors"
-                >
-                  <ExternalLink className="w-5 h-5" />
-                  <span>Launch Live Build</span>
-                </a>
-              )}
-            </div>
+            </form>
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 };
 
-export default ProjectsSection;
+export default SponsorSection;
