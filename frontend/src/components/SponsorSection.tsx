@@ -131,7 +131,6 @@ const SponsorSection = () => {
                 <Terminal className="w-5 h-5 sm:w-6 sm:h-6 text-textSecondary mb-2 shrink-0" />
                 <span className="text-white font-medium text-xs sm:text-sm line-clamp-1 break-all">{sponsor.sponsorName}</span>
                 
-                {/* FIX: Replaced standard span with a flex container and gap-1.5 to strictly enforce spacing */}
                 <div className="flex items-center gap-1.5 text-accent font-mono text-[10px] sm:text-xs mt-1.5">
                   <span>{sponsor.currency}</span>
                   <span>{sponsor.amount.toLocaleString()}</span>
@@ -166,7 +165,7 @@ const SponsorSection = () => {
               <div>
                 <label className="block text-[10px] sm:text-xs font-mono text-textSecondary mb-1">Amount (INR)</label>
                 <div className="relative">
-                  <span className="absolute left-4 text-zinc-500 font-mono text-sm pointer-events-none">₹</span>
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 font-mono text-sm pointer-events-none">₹</span>
                   <input 
                     type="number" 
                     value={amount} 
