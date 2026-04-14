@@ -94,7 +94,7 @@ const MetricsSection = () => {
           </span>
         </a>
 
-        <a href="https://www.linkedin.com/in/ayush-tripathi" target="_blank" rel="noreferrer" className="group flex flex-col items-center justify-center p-4 sm:p-6 bg-zinc-950 border border-zinc-800 rounded-2xl hover:border-white transition-all duration-300 w-full min-w-0">
+        <a href="https://www.linkedin.com/in/ayush-tripathi-89265923a/" target="_blank" rel="noreferrer" className="group flex flex-col items-center justify-center p-4 sm:p-6 bg-zinc-950 border border-zinc-800 rounded-2xl hover:border-white transition-all duration-300 w-full min-w-0">
           <Linkedin className="w-6 h-6 sm:w-7 sm:h-7 text-zinc-500 group-hover:text-white mb-2 sm:mb-3 transition-colors shrink-0" />
           <span className="text-[10px] sm:text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Connect</span>
           <span className="text-xs sm:text-sm font-mono text-white text-center break-words">LinkedIn</span>
