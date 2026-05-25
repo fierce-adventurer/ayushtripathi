@@ -81,11 +81,34 @@ const SponsorSection = () => {
         description: "Portfolio Sponsorship",
         image: "https://your-domain.com/logo.png", 
         order_id: order.id, 
-        handler: function (response: any) {
-          alert(`Success! Payment ID: ${response.razorpay_payment_id}`);
-          setIsModalOpen(false);
-          setSponsorName('');
-          setEmail('');
+        handler: async function (response: any) {
+          try {
+            setIsProcessing(true);
+            await axios.post(`${API_URL}/api/payments/verify-payment`, {
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+              sponsorName: sponsorName,
+              email: email,
+              amount: amount,
+              currency: "INR"
+            });
+            
+            alert(`Success! Sponsorship registered. Payment ID: ${response.razorpay_payment_id}`);
+            setIsModalOpen(false);
+            setSponsorName('');
+            setEmail('');
+            
+            // Refresh sponsors list
+            const { data: updatedSponsors } = await axios.get(`${API_URL}/api/sponsors`);
+            setSponsors(updatedSponsors);
+          } catch (error: any) {
+            console.error("Verification failed", error);
+            const errorMsg = error.response?.data?.message || error.message || "Unknown Error";
+            alert(`Payment success, but registration failed: ${errorMsg}`);
+          } finally {
+            setIsProcessing(false);
+          }
         },
         prefill: {
           name: sponsorName,
