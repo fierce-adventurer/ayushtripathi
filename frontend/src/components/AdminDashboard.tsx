@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { Lock, Unlock, UploadCloud, FileText, Trash2, User, Briefcase } from 'lucide-react';
+import { Lock, Unlock, FolderGit2, FileText, User, Briefcase } from 'lucide-react';
 
 const AdminDashboard = () => {
   const [secretKey, setSecretKey] = useState('');
@@ -20,18 +20,8 @@ const AdminDashboard = () => {
   const [expTechStack, setExpTechStack] = useState('');
   const [expDeleteId, setExpDeleteId] = useState('');
 
-  // Project form state
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [techStack, setTechStack] = useState('');
-  const [githubUrl, setGithubUrl] = useState('');
-  const [liveUrl, setLiveUrl] = useState('');
-
   // Use an environment variable with a fallback
   const API_URL = import.meta.env.VITE_API_BASE_URL;
-
-  // Delete project state
-  const [deleteId, setDeleteId] = useState('');
 
   // Resume file state
   const [file, setFile] = useState<File | null>(null);
@@ -163,45 +153,18 @@ const AdminDashboard = () => {
     }
   };
 
-  // Upload Project
-  const handleProjectSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setStatus('Uploading project...');
+  // Sync Projects directly from GitHub API
+  const handleSyncGitHubProjects = async () => {
+    setStatus('Syncing live public repositories from GitHub API...');
     try {
-      await axios.post(
-        `${API_URL}/api/admin/projects`,
-        { title, description, techStack, githubUrl, liveUrl },
+      const res = await axios.post(
+        `${API_URL}/api/admin/projects/sync`,
+        {},
         { headers: { 'X-Admin-Secret': secretKey } }
       );
-      setStatus('Project successfully added to database!');
-      setTitle('');
-      setDescription('');
-      setTechStack('');
-      setGithubUrl('');
-      setLiveUrl('');
+      setStatus(`Successfully synced ${res.data?.length || 0} repositories directly from GitHub!`);
     } catch (err: any) {
-      setStatus(`Error: ${err.response?.data || 'Failed to upload project.'}`);
-    }
-  };
-
-  // Delete Project
-  const handleDeleteProject = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!deleteId.trim()) return;
-    
-    setStatus('Deleting project...');
-    try {
-      await axios.delete(`${API_URL}/api/admin/projects/${deleteId.trim()}`, {
-        headers: { 'X-Admin-Secret': secretKey }
-      });
-      setStatus('Project successfully deleted!');
-      setDeleteId('');
-    } catch (err: any) {
-      if (err.response?.status === 404) {
-        setStatus('Error: Project not found. Check the UUID.');
-      } else {
-        setStatus(`Error: ${err.response?.data || 'Failed to delete project.'}`);
-      }
+      setStatus(`Error: ${err.response?.data?.message || err.response?.data || 'Failed to sync with GitHub API.'}`);
     }
   };
 
@@ -364,23 +327,26 @@ const AdminDashboard = () => {
             </div>
           </div>
 
-          {/* 3. Upload Project Form */}
+          {/* 3. GitHub API Live Projects Sync */}
           <div className="w-full bg-zinc-950 p-5 sm:p-8 border border-zinc-800 rounded-xl shadow-xl">
-            <div className="flex items-center gap-2 mb-6">
-              <UploadCloud className="w-5 h-5 text-zinc-400 shrink-0" />
-              <h2 className="text-base sm:text-lg font-semibold text-white">Deploy Project</h2>
+            <div className="flex items-center gap-2 mb-4">
+              <FolderGit2 className="w-5 h-5 text-zinc-400 shrink-0" />
+              <h2 className="text-base sm:text-lg font-semibold text-white">Live GitHub Repositories</h2>
             </div>
-            <form onSubmit={handleProjectSubmit} className="flex flex-col gap-4 w-full">
-              <input type="text" placeholder="Project Title" value={title} onChange={(e) => setTitle(e.target.value)} className="w-full bg-zinc-900 border border-zinc-800 text-white p-3 rounded-lg focus:border-white outline-none text-sm transition-colors" required />
-              <textarea placeholder="Description" value={description} onChange={(e) => setDescription(e.target.value)} className="w-full bg-zinc-900 border border-zinc-800 text-white p-3 rounded-lg focus:border-white outline-none text-sm h-32 resize-none transition-colors" required />
-              <input type="text" placeholder="Tech Stack (e.g. Java, React, Docker)" value={techStack} onChange={(e) => setTechStack(e.target.value)} className="w-full bg-zinc-900 border border-zinc-800 text-white p-3 rounded-lg focus:border-white outline-none text-sm transition-colors" required />
-              <input type="url" placeholder="GitHub URL (Optional)" value={githubUrl} onChange={(e) => setGithubUrl(e.target.value)} className="w-full bg-zinc-900 border border-zinc-800 text-white p-3 rounded-lg focus:border-white outline-none text-sm transition-colors" />
-              <input type="url" placeholder="Live URL (Optional)" value={liveUrl} onChange={(e) => setLiveUrl(e.target.value)} className="w-full bg-zinc-900 border border-zinc-800 text-white p-3 rounded-lg focus:border-white outline-none text-sm transition-colors" />
-              <button type="submit" className="w-full bg-white text-black font-bold py-3 rounded-lg mt-2 hover:bg-zinc-200 transition-colors">Upload to Database</button>
-            </form>
+            <p className="text-xs sm:text-sm text-zinc-400 mb-4 leading-relaxed">
+              Projects are now dynamically fetched directly from the GitHub API (<span className="text-white font-mono">fierce-adventurer</span>) with in-memory caching. Manual database storage has been deprecated.
+            </p>
+            <button 
+              type="button" 
+              onClick={handleSyncGitHubProjects} 
+              className="w-full bg-white text-black font-bold py-3 rounded-lg hover:bg-zinc-200 transition-colors flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <FolderGit2 className="w-4 h-4" />
+              Sync Projects from GitHub Now
+            </button>
           </div>
 
-          {/* 2. AI Resume Ingestion Form */}
+          {/* 4. AI Resume Ingestion Form */}
           <div className="w-full bg-zinc-950 p-5 sm:p-8 border border-zinc-800 rounded-xl shadow-xl">
             <div className="flex items-center gap-2 mb-6">
               <FileText className="w-5 h-5 text-zinc-400 shrink-0" />
@@ -398,30 +364,6 @@ const AdminDashboard = () => {
                 required 
               />
               <button type="submit" className="w-full border border-white text-white font-bold py-3 rounded-lg mt-2 hover:bg-white hover:text-black transition-colors">Embed PDF</button>
-            </form>
-          </div>
-
-          {/* 3. Delete Project Form */}
-          <div className="w-full bg-zinc-950 p-5 sm:p-8 border border-red-900/30 rounded-xl shadow-xl relative overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-600 to-red-900"></div>
-            
-            <div className="flex items-center gap-2 mb-6">
-              <Trash2 className="w-5 h-5 text-red-500 shrink-0" />
-              <h2 className="text-base sm:text-lg font-semibold text-white">Danger Zone: Delete Project</h2>
-            </div>
-            <form onSubmit={handleDeleteProject} className="flex flex-col gap-4 w-full">
-              <p className="text-xs sm:text-sm text-zinc-400 mb-2">Enter the exact UUID of the project to permanently remove it from the live database.</p>
-              <input 
-                type="text" 
-                placeholder="e.g. 123e4567-e89b..." 
-                value={deleteId} 
-                onChange={(e) => setDeleteId(e.target.value)} 
-                className="w-full bg-zinc-900 border border-zinc-800 text-white p-3 rounded-lg focus:border-red-500 outline-none text-xs sm:text-sm font-mono transition-colors" 
-                required 
-              />
-              <button type="submit" className="w-full bg-red-500/10 text-red-500 border border-red-500/50 font-bold py-3 rounded-lg mt-2 hover:bg-red-500 hover:text-white transition-all">
-                Permanently Delete Project
-              </button>
             </form>
           </div>
 

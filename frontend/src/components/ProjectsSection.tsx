@@ -52,7 +52,7 @@ const ProjectsSection = () => {
   if (loading) {
     return (
       <div className="w-full font-mono text-textSecondary text-sm animate-pulse min-h-[30vh]">
-        &gt; SYSTEM: Fetching projects from secure database...
+        &gt; SYSTEM: Fetching live repositories from GitHub API...
       </div>
     );
   }

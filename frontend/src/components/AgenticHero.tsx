@@ -5,7 +5,7 @@ import type { Profile } from '../types';
 const defaultProfile: Profile = {
   name: "Ayush Tripathi",
   role: "Backend Developer",
-  education: "",
+  education: "B.Tech in CSE @ Gurukul Kangri Deemed to be University",
   bio: ""
 };
 
@@ -15,20 +15,35 @@ const AgenticHero = () => {
   const API_URL = import.meta.env.VITE_API_BASE_URL;
 
   useEffect(() => {
-    const fetchProfile = async () => {
+    const fetchDynamicBio = async () => {
       try {
-        const response = await axios.get(`${API_URL}/api/profile`);
-        if (response.data && response.data.name) {
-          setProfile(response.data);
+        const response = await axios.get(`${API_URL}/api/profile/dynamic-bio`);
+        if (response.data) {
+          setProfile(prev => ({
+            ...prev,
+            name: response.data.name || prev.name,
+            role: response.data.role || prev.role,
+            education: response.data.education || prev.education,
+            bio: response.data.bio || prev.bio
+          }));
         }
       } catch (err) {
-        console.debug("Could not fetch profile:", err);
+        console.debug("Could not fetch real-time dynamic bio, falling back to profile:", err);
+        try {
+          const fallback = await axios.get(`${API_URL}/api/profile`);
+          if (fallback.data) {
+            setProfile(fallback.data);
+          }
+        } catch (e) {
+          console.debug("Fallback failed as well:", e);
+        }
       } finally {
         setLoading(false);
       }
     };
+
     if (API_URL) {
-      fetchProfile();
+      fetchDynamicBio();
     } else {
       setLoading(false);
     }
@@ -50,7 +65,7 @@ const AgenticHero = () => {
         {profile.bio ? (
           profile.bio
         ) : loading ? (
-          <span className="text-zinc-600 animate-pulse">&gt; Loading bio from Groq Llama-3...</span>
+          <span className="text-zinc-600 animate-pulse">&gt; Synthesizing dynamic bio from resume vector embeddings &amp; GitHub...</span>
         ) : null}
         
         {/* The permanent blinking cursor to keep the terminal vibe alive */}
