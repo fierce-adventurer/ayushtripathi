@@ -144,29 +144,21 @@ const SponsorSection = () => {
     <>
       {sponsors.length > 0 && (
         <div id="sponsor" className="w-full pt-20 sm:pt-24 min-h-[40vh]">
-          <div className="flex items-center gap-3 mb-8 sm:mb-12">
-            <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center">
-              <Award className="w-5 h-5 text-purple-400 shrink-0" />
-            </div>
-            <div>
-              <span className="text-[11px] font-mono tracking-widest text-purple-400 uppercase">Community Backers</span>
-              <h2 className="text-2xl sm:text-3xl font-extrabold uppercase tracking-tight text-white font-heading">
-                Wall of <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-pink-500">Fame</span>
-              </h2>
-            </div>
+          <div className="flex items-center gap-2 sm:gap-3 mb-8 sm:mb-12">
+            <Award className="w-5 h-5 sm:w-6 sm:h-6 text-accent shrink-0" />
+            <h2 className="text-xl sm:text-2xl font-bold text-textPrimary tracking-tight">Wall_of_Fame</h2>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4 w-full">
             {sponsors.map((sponsor, index) => (
-              <div key={index} className="bg-[#120D24]/80 backdrop-blur-md border border-purple-500/20 rounded-xl p-4 flex flex-col items-center justify-center text-center hover:border-purple-500/50 hover:shadow-[0_0_20px_rgba(139,92,246,0.15)] transition-all w-full min-w-0 group">
-                <div className="w-8 h-8 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
-                  <Terminal className="w-4 h-4 text-purple-400 shrink-0" />
-                </div>
-                <span className="text-white font-semibold text-xs sm:text-sm line-clamp-1 break-all">{sponsor.sponsorName}</span>
+              <div key={index} className="bg-surface border border-zinc-800 rounded-lg p-3 sm:p-4 flex flex-col items-center justify-center text-center hover:border-zinc-600 transition-colors w-full min-w-0">
+                <Terminal className="w-5 h-5 sm:w-6 sm:h-6 text-textSecondary mb-2 shrink-0" />
+                <span className="text-white font-medium text-xs sm:text-sm line-clamp-1 break-all">{sponsor.sponsorName}</span>
                 
-                <div className="flex items-center gap-1.5 text-cyan-400 font-mono text-[10px] sm:text-xs mt-1.5 font-bold">
+                <div className="flex items-center gap-1.5 text-accent font-mono text-[10px] sm:text-xs mt-1.5">
                   <span>{sponsor.currency}</span>
                   <span>{sponsor.amount.toLocaleString()}</span>
                 </div>
+
               </div>
             ))}
           </div>
@@ -175,42 +167,38 @@ const SponsorSection = () => {
 
       {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
           <div className="absolute inset-0 cursor-pointer" onClick={() => setIsModalOpen(false)}></div>
-          <div className="relative w-full max-w-md bg-[#120D24] border border-purple-500/30 rounded-2xl shadow-[0_0_50px_rgba(139,92,246,0.25)] p-6 sm:p-8 z-10 max-h-[90vh] overflow-y-auto">
-            <button onClick={() => setIsModalOpen(false)} className="absolute top-4 right-4 text-zinc-400 hover:text-white bg-purple-950/40 border border-purple-500/20 p-1.5 rounded-lg transition-colors">
-              <X className="w-4 h-4" />
-            </button>
+          <div className="relative w-full max-w-md bg-surface border border-zinc-700 rounded-xl shadow-2xl p-6 sm:p-8 z-10 max-h-[90vh] overflow-y-auto">
+            <button onClick={() => setIsModalOpen(false)} className="absolute top-3 sm:top-4 right-3 sm:right-4 text-textSecondary hover:text-white bg-surface p-1 rounded-md"><X className="w-5 h-5" /></button>
             <div className="flex flex-col items-center mb-6 mt-2">
-              <div className="w-12 h-12 bg-gradient-to-br from-amber-500/20 to-purple-600/20 border border-purple-500/40 rounded-2xl flex items-center justify-center mb-3 shrink-0 shadow-[0_0_20px_rgba(139,92,246,0.2)]">
-                <Zap className="w-6 h-6 text-amber-400" />
-              </div>
-              <h3 className="text-xl font-extrabold uppercase tracking-tight text-white font-heading">Support the Code</h3>
-              <p className="text-[11px] text-zinc-400 font-mono mt-1 text-center">Initialize secure connection to payment gateway.</p>
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-accent/20 rounded-full flex items-center justify-center mb-3 sm:mb-4 shrink-0"><Zap className="w-5 h-5 sm:w-6 sm:h-6 text-accent" /></div>
+              <h3 className="text-lg sm:text-xl font-bold text-white text-center">Support the Code</h3>
+              <p className="text-[10px] sm:text-xs text-textSecondary font-mono mt-1 sm:mt-2 text-center">Initialize secure connection to payment gateway.</p>
             </div>
-            <form onSubmit={handlePayment} className="flex flex-col gap-3.5 w-full">
+            <form onSubmit={handlePayment} className="flex flex-col gap-3 sm:gap-4 w-full">
               <div>
-                <label className="block text-[11px] font-mono text-purple-300 uppercase tracking-wider mb-1">Display Name</label>
-                <input type="text" value={sponsorName} onChange={(e) => setSponsorName(e.target.value)} placeholder="Your Name" className="w-full bg-[#080511] border border-purple-500/30 text-white p-3 rounded-xl focus:border-cyan-400 focus:shadow-[0_0_15px_rgba(56,189,248,0.2)] outline-none text-xs sm:text-sm transition-all" required />
+                <label className="block text-[10px] sm:text-xs font-mono text-textSecondary mb-1">Display Name</label>
+                <input type="text" value={sponsorName} onChange={(e) => setSponsorName(e.target.value)} placeholder="Your Name" className="w-full bg-background border border-zinc-800 text-white p-2.5 sm:p-3 rounded-md focus:border-accent text-xs sm:text-sm" required />
               </div>
               <div>
-                <label className="block text-[11px] font-mono text-purple-300 uppercase tracking-wider mb-1">Email Address</label>
-                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="contact@domain.com" className="w-full bg-[#080511] border border-purple-500/30 text-white p-3 rounded-xl focus:border-cyan-400 focus:shadow-[0_0_15px_rgba(56,189,248,0.2)] outline-none text-xs sm:text-sm transition-all" required />
+                <label className="block text-[10px] sm:text-xs font-mono text-textSecondary mb-1">Email Address</label>
+                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="contact@domain.com" className="w-full bg-background border border-zinc-800 text-white p-2.5 sm:p-3 rounded-md focus:border-accent text-xs sm:text-sm" required />
               </div>
               <div>
-                <label className="block text-[11px] font-mono text-purple-300 uppercase tracking-wider mb-1">Amount (INR)</label>
+                <label className="block text-[10px] sm:text-xs font-mono text-textSecondary mb-1">Amount (INR)</label>
                 <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-cyan-400 font-mono text-sm pointer-events-none font-bold">₹</span>
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 font-mono text-sm pointer-events-none">₹</span>
                   <input 
                     type="number" 
                     value={amount} 
                     onChange={(e) => setAmount(Number(e.target.value))} 
-                    className="w-full bg-[#080511] border border-purple-500/30 text-white py-3 pr-3 pl-10 rounded-xl focus:border-cyan-400 focus:shadow-[0_0_15px_rgba(56,189,248,0.2)] outline-none text-xs sm:text-sm font-mono font-semibold transition-all" 
+                    className="w-full bg-background border border-zinc-800 text-white py-2.5 sm:py-3 pr-3 pl-10 rounded-md focus:border-accent text-xs sm:text-sm" 
                     required 
                   />
                 </div>
               </div>
-              <button type="submit" disabled={isProcessing} className="w-full mt-3 neon-gradient-btn text-white font-bold py-3.5 rounded-xl hover:opacity-95 disabled:opacity-50 text-sm tracking-wide shadow-[0_0_25px_rgba(249,115,22,0.35)] transition-all">
+              <button type="submit" disabled={isProcessing} className="w-full mt-2 sm:mt-4 bg-white text-black font-bold py-2.5 sm:py-3 rounded-md hover:bg-gray-200 disabled:opacity-50 text-sm sm:text-base">
                 {isProcessing ? 'Establishing Link...' : 'Proceed to Checkout'}
               </button>
             </form>

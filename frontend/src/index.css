@@ -5,22 +5,16 @@ html {
 }
 
 @theme {
-  /* Cyber-Luxe Dark Neon Palette */
-  --color-background: #080511;
-  --color-surface: #120D24;
-  --color-surfaceHover: #1A1336;
-  --color-textPrimary: #FFFFFF;
-  --color-textSecondary: #94A3B8;
-  --color-accent: #38BDF8;
-  --color-accentPurple: #8B5CF6;
-  --color-accentAmber: #F97316;
-  --color-accentCyan: #06B6D4;
-  --color-borderPurple: #2A1D4E;
+  /* Our AI Aesthetic Color Palette */
+  --color-background: #09090b;
+  --color-surface: #18181b;
+  --color-textPrimary: #f4f4f5;
+  --color-textSecondary: #a1a1aa;
+  --color-accent: #3b82f6;
 
   /* Animations */
   --animate-cursor-blink: blink 1s step-end infinite;
   --animate-infinite-scroll: infinite-scroll 25s linear infinite;
-  --animate-pulse-slow: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 
   @keyframes blink {
     0%, 100% { opacity: 1; }
@@ -29,7 +23,7 @@ html {
 
   @keyframes infinite-scroll {
     from { transform: translateX(0); }
-    to { transform: translateX(-50%); }
+    to { transform: translateX(-50%); } /* Scrolls exactly half the width to seamlessly loop */
   }
 }
 
@@ -37,45 +31,12 @@ html {
   body {
     background-color: var(--color-background);
     color: var(--color-textPrimary);
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: 'Inter', sans-serif;
     -webkit-font-smoothing: antialiased;
-    overflow-x: hidden;
   }
   
   ::selection {
-    background-color: #7C3AED;
+    background-color: var(--color-accent);
     color: #ffffff;
   }
-}
-
-/* Atmospheric Ambient & Dotted Pattern Utilities */
-.dot-pattern-amber {
-  background-image: radial-gradient(rgba(249, 115, 22, 0.35) 1.5px, transparent 1.5px);
-  background-size: 14px 14px;
-}
-
-.dot-pattern-cyan {
-  background-image: radial-gradient(rgba(6, 182, 212, 0.3) 1.5px, transparent 1.5px);
-  background-size: 14px 14px;
-}
-
-.glass-card {
-  background: rgba(18, 13, 36, 0.7);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(139, 92, 246, 0.15);
-}
-
-.glass-card:hover {
-  border-color: rgba(139, 92, 246, 0.4);
-}
-
-.neon-gradient-btn {
-  background: linear-gradient(135deg, #2563EB 0%, #4F46E5 50%, #7C3AED 100%);
-  transition: all 0.3s ease;
-}
-
-.neon-gradient-btn:hover {
-  background: linear-gradient(135deg, #3B82F6 0%, #6366F1 50%, #8B5CF6 100%);
-  box-shadow: 0 0 25px rgba(99, 102, 241, 0.45);
 }
