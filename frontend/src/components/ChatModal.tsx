@@ -130,6 +130,10 @@ const ChatModal = () => {
         body: JSON.stringify({ question: userQuery })
       });
 
+      if (!response.ok) {
+        throw new Error(`Server returned HTTP ${response.status}`);
+      }
+
       if (!response.body) throw new Error('No readable stream available.');
 
       const reader = response.body.getReader();

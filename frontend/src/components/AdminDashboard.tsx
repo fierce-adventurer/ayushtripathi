@@ -17,10 +17,24 @@ const AdminDashboard = () => {
   // Experience form state
   const [expRole, setExpRole] = useState('');
   const [expCompany, setExpCompany] = useState('');
-  const [expPeriod, setExpPeriod] = useState('');
+  const [expStartDate, setExpStartDate] = useState('');
+  const [expEndDate, setExpEndDate] = useState('');
+  const [expIsCurrent, setExpIsCurrent] = useState(false);
   const [expDescription, setExpDescription] = useState('');
   const [expTechStack, setExpTechStack] = useState('');
   const [expDeleteId, setExpDeleteId] = useState('');
+
+  const formatPeriodMonth = (monthStr: string) => {
+    if (!monthStr) return '';
+    try {
+      const [year, month] = monthStr.split('-');
+      if (!year || !month) return monthStr;
+      const date = new Date(parseInt(year), parseInt(month) - 1, 1);
+      return date.toLocaleString('en-US', { month: 'short', year: 'numeric' });
+    } catch {
+      return monthStr;
+    }
+  };
 
   // API base URL
   const API_URL = import.meta.env.VITE_API_BASE_URL;
@@ -90,6 +104,27 @@ const AdminDashboard = () => {
   // Add Experience
   const handleExperienceSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!expStartDate) {
+      setStatus('Validation Error: Start Date is required.');
+      return;
+    }
+
+    if (!expIsCurrent) {
+      if (!expEndDate) {
+        setStatus('Validation Error: End Date is required (or check "Currently working here").');
+        return;
+      }
+      if (expStartDate > expEndDate) {
+        setStatus('Validation Error: Start Date cannot be later than End Date!');
+        return;
+      }
+    }
+
+    const formattedStart = formatPeriodMonth(expStartDate);
+    const formattedEnd = expIsCurrent ? 'Present' : formatPeriodMonth(expEndDate);
+    const computedPeriod = `${formattedStart} - ${formattedEnd}`;
+
     setStatus('Adding work experience...');
     try {
       await axios.post(
@@ -97,16 +132,20 @@ const AdminDashboard = () => {
         {
           role: expRole,
           company: expCompany,
-          period: expPeriod,
+          period: computedPeriod,
+          startDate: expStartDate,
+          endDate: expIsCurrent ? 'Present' : expEndDate,
           description: expDescription,
           techStack: expTechStack
         },
         { headers: { 'X-Admin-Secret': secretKey } }
       );
-      setStatus('Work experience successfully saved to database!');
+      setStatus(`Work experience "${expRole} @ ${expCompany}" successfully saved to database!`);
       setExpRole('');
       setExpCompany('');
-      setExpPeriod('');
+      setExpStartDate('');
+      setExpEndDate('');
+      setExpIsCurrent(false);
       setExpDescription('');
       setExpTechStack('');
     } catch (err: any) {
@@ -263,8 +302,47 @@ const AdminDashboard = () => {
                 <input type="text" placeholder="Role (e.g. Software Engineer)" value={expRole} onChange={(e) => setExpRole(e.target.value)} className="w-full bg-zinc-900 border border-zinc-800 text-white p-3 rounded-lg focus:border-white outline-none text-sm transition-colors" required />
                 <input type="text" placeholder="Company (e.g. Tech Corp)" value={expCompany} onChange={(e) => setExpCompany(e.target.value)} className="w-full bg-zinc-900 border border-zinc-800 text-white p-3 rounded-lg focus:border-white outline-none text-sm transition-colors" required />
               </div>
+
+              {/* Start Date & End Date Section with Chronological Validation */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <input type="text" placeholder="Period (e.g. Jan 2026 - Present)" value={expPeriod} onChange={(e) => setExpPeriod(e.target.value)} className="w-full bg-zinc-900 border border-zinc-800 text-white p-3 rounded-lg focus:border-white outline-none text-sm transition-colors" />
+                <div>
+                  <label className="block text-xs font-mono text-zinc-400 mb-1.5">Start Date *</label>
+                  <input
+                    type="month"
+                    value={expStartDate}
+                    onChange={(e) => setExpStartDate(e.target.value)}
+                    className="w-full bg-zinc-900 border border-zinc-800 text-white p-3 rounded-lg focus:border-white outline-none text-sm transition-colors [color-scheme:dark]"
+                    required
+                  />
+                </div>
+                <div>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="block text-xs font-mono text-zinc-400">End Date {!expIsCurrent && '*'}</label>
+                    <label className="flex items-center gap-1.5 text-xs text-zinc-400 cursor-pointer select-none">
+                      <input
+                        type="checkbox"
+                        checked={expIsCurrent}
+                        onChange={(e) => {
+                          setExpIsCurrent(e.target.checked);
+                          if (e.target.checked) setExpEndDate('');
+                        }}
+                        className="rounded bg-zinc-900 border-zinc-700 text-white focus:ring-0 cursor-pointer"
+                      />
+                      <span>Present</span>
+                    </label>
+                  </div>
+                  <input
+                    type="month"
+                    value={expEndDate}
+                    onChange={(e) => setExpEndDate(e.target.value)}
+                    disabled={expIsCurrent}
+                    className="w-full bg-zinc-900 border border-zinc-800 text-white p-3 rounded-lg focus:border-white outline-none text-sm transition-colors disabled:opacity-30 disabled:cursor-not-allowed [color-scheme:dark]"
+                    required={!expIsCurrent}
+                  />
+                </div>
+              </div>
+
+              <div>
                 <input type="text" placeholder="Tech Stack (comma separated: React, Java, Docker)" value={expTechStack} onChange={(e) => setExpTechStack(e.target.value)} className="w-full bg-zinc-900 border border-zinc-800 text-white p-3 rounded-lg focus:border-white outline-none text-sm transition-colors" />
               </div>
               <textarea placeholder="Job responsibilities and impact..." value={expDescription} onChange={(e) => setExpDescription(e.target.value)} className="w-full bg-zinc-900 border border-zinc-800 text-white p-3 rounded-lg focus:border-white outline-none text-sm h-24 resize-none transition-colors" required />
