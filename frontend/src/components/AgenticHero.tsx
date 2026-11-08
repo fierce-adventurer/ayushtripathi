@@ -5,12 +5,13 @@ import type { Profile } from '../types';
 const defaultProfile: Profile = {
   name: "Ayush Tripathi",
   role: "Backend Developer",
-  education: "B.Tech in CSE @ Gurukul Kangri Deemed to be University",
-  bio: "Experienced in building scalable backend systems and event-driven architectures. My core stack includes Java, Spring Boot, Microservices, Kafka, and Docker.\n\nCurrently seeking hands-on internship opportunities to engineer robust solutions."
+  education: "",
+  bio: ""
 };
 
 const AgenticHero = () => {
   const [profile, setProfile] = useState<Profile>(defaultProfile);
+  const [loading, setLoading] = useState(true);
   const API_URL = import.meta.env.VITE_API_BASE_URL;
 
   useEffect(() => {
@@ -21,11 +22,15 @@ const AgenticHero = () => {
           setProfile(response.data);
         }
       } catch (err) {
-        console.debug("Using default profile state:", err);
+        console.debug("Could not fetch profile:", err);
+      } finally {
+        setLoading(false);
       }
     };
     if (API_URL) {
       fetchProfile();
+    } else {
+      setLoading(false);
     }
   }, [API_URL]);
 
@@ -42,7 +47,11 @@ const AgenticHero = () => {
       <div className="font-mono text-sm sm:text-base md:text-lg text-zinc-400 leading-relaxed whitespace-pre-wrap break-words">
         {profile.role && <>&gt; Role: {profile.role}<br /></>}
         {profile.education && <>&gt; Education: {profile.education}<br /><br /></>}
-        {profile.bio}
+        {profile.bio ? (
+          profile.bio
+        ) : loading ? (
+          <span className="text-zinc-600 animate-pulse">&gt; Loading bio from Groq Llama-3...</span>
+        ) : null}
         
         {/* The permanent blinking cursor to keep the terminal vibe alive */}
         <span className="inline-block w-2 h-4 sm:h-5 ml-1 bg-white animate-cursor-blink align-middle"></span>

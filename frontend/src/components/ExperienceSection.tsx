@@ -3,34 +3,28 @@ import axios from 'axios';
 import { Briefcase } from 'lucide-react';
 import type { Experience } from '../types';
 
-const defaultExperiences: Experience[] = [
-  {
-    id: 1,
-    role: "Virtual Software Engineering Intern",
-    company: "IIT Ropar",
-    period: "Jan 2026",
-    description: "Participated in an intensive 10-week virtual internship focusing on full-stack web development.",
-    techStack: ["MongoDB", "Express.js", "React", "Node.js"]
-  }
-];
-
 const ExperienceSection = () => {
-  const [experiences, setExperiences] = useState<Experience[]>(defaultExperiences);
+  const [experiences, setExperiences] = useState<Experience[]>([]);
+  const [loading, setLoading] = useState(true);
   const API_URL = import.meta.env.VITE_API_BASE_URL;
 
   useEffect(() => {
     const fetchExperiences = async () => {
       try {
         const response = await axios.get(`${API_URL}/api/experiences`);
-        if (Array.isArray(response.data) && response.data.length > 0) {
+        if (Array.isArray(response.data)) {
           setExperiences(response.data);
         }
       } catch (err) {
-        console.debug("Using default experiences state:", err);
+        console.debug("Could not fetch experiences:", err);
+      } finally {
+        setLoading(false);
       }
     };
     if (API_URL) {
       fetchExperiences();
+    } else {
+      setLoading(false);
     }
   }, [API_URL]);
 
@@ -39,6 +33,11 @@ const ExperienceSection = () => {
     if (Array.isArray(techStack)) return techStack;
     return techStack.split(',').map(t => t.trim()).filter(Boolean);
   };
+
+  // If there are no experiences from the database or resume, do not display the section
+  if (loading || experiences.length === 0) {
+    return null;
+  }
 
   return (
     // Changed min-h-[50vh] to something fluid so it doesn't force awkward empty space on small screens
