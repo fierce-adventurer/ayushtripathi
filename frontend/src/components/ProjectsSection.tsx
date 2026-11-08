@@ -23,15 +23,37 @@ const ProjectsSection = () => {
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const response = await axios.get(`${API_URL}/api/projects`);
-        if (Array.isArray(response.data)) {
-          setProjects(response.data);
-        } else {
-          throw new Error('Database returned an invalid format.');
+        if (API_URL) {
+          const response = await axios.get(`${API_URL}/api/projects`);
+          if (Array.isArray(response.data) && response.data.length > 0) {
+            setProjects(response.data);
+            setLoading(false);
+            return;
+          }
         }
       } catch (err) {
-        console.error("Project fetch error:", err);
-        setError('Failed to establish connection to the backend database.');
+        console.warn("Backend project fetch failed, falling back to direct GitHub API:", err);
+      }
+
+      // Direct GitHub API fallback
+      try {
+        const ghRes = await axios.get('https://api.github.com/users/fierce-adventurer/repos?sort=updated&per_page=100');
+        if (Array.isArray(ghRes.data)) {
+          const mapped: Project[] = ghRes.data
+            .filter((repo: any) => !repo.fork)
+            .map((repo: any) => ({
+              id: String(repo.id),
+              title: repo.name,
+              description: repo.description || 'Public GitHub repository module.',
+              techStack: repo.language || 'GitHub Repository',
+              githubUrl: repo.html_url,
+              liveUrl: repo.homepage || null
+            }));
+          setProjects(mapped);
+        }
+      } catch (ghErr) {
+        console.error("Direct GitHub API fetch error:", ghErr);
+        setError('Failed to fetch repositories from GitHub API.');
       } finally {
         setLoading(false);
       }

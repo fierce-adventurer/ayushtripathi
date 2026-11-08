@@ -19,12 +19,13 @@ const AgenticHero = () => {
       try {
         const response = await axios.get(`${API_URL}/api/profile/dynamic-bio`);
         if (response.data) {
+          const bio = response.data.bio?.startsWith("Experienced in building scalable backend systems") ? "" : response.data.bio;
           setProfile(prev => ({
             ...prev,
             name: response.data.name || prev.name,
             role: response.data.role || prev.role,
             education: response.data.education || prev.education,
-            bio: response.data.bio || prev.bio
+            bio: bio || prev.bio
           }));
         }
       } catch (err) {
@@ -32,7 +33,14 @@ const AgenticHero = () => {
         try {
           const fallback = await axios.get(`${API_URL}/api/profile`);
           if (fallback.data) {
-            setProfile(fallback.data);
+            const bio = fallback.data.bio?.startsWith("Experienced in building scalable backend systems") ? "" : fallback.data.bio;
+            setProfile(prev => ({
+              ...prev,
+              name: fallback.data.name || prev.name,
+              role: fallback.data.role || prev.role,
+              education: fallback.data.education || prev.education,
+              bio: bio || prev.bio
+            }));
           }
         } catch (e) {
           console.debug("Fallback failed as well:", e);
