@@ -1,10 +1,24 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { Lock, Unlock, UploadCloud, FileText, Trash2 } from 'lucide-react';
+import { Lock, Unlock, UploadCloud, FileText, Trash2, User, Briefcase } from 'lucide-react';
 
 const AdminDashboard = () => {
   const [secretKey, setSecretKey] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  // Profile form state
+  const [profileName, setProfileName] = useState('');
+  const [profileRole, setProfileRole] = useState('');
+  const [profileEducation, setProfileEducation] = useState('');
+  const [profileBio, setProfileBio] = useState('');
+
+  // Experience form state
+  const [expRole, setExpRole] = useState('');
+  const [expCompany, setExpCompany] = useState('');
+  const [expPeriod, setExpPeriod] = useState('');
+  const [expDescription, setExpDescription] = useState('');
+  const [expTechStack, setExpTechStack] = useState('');
+  const [expDeleteId, setExpDeleteId] = useState('');
 
   // Project form state
   const [title, setTitle] = useState('');
@@ -25,6 +39,20 @@ const AdminDashboard = () => {
   // Status messages
   const [status, setStatus] = useState('');
 
+  const loadProfile = async () => {
+    try {
+      const res = await axios.get(`${API_URL}/api/profile`);
+      if (res.data) {
+        setProfileName(res.data.name || '');
+        setProfileRole(res.data.role || '');
+        setProfileEducation(res.data.education || '');
+        setProfileBio(res.data.bio || '');
+      }
+    } catch (err) {
+      console.debug("Could not pre-fetch profile", err);
+    }
+  };
+
   // Authentication
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,8 +61,73 @@ const AdminDashboard = () => {
     if (secretKey === correctKey) {
       setIsAuthenticated(true);
       setStatus('');
+      loadProfile();
     } else {
       setStatus('ACCESS DENIED: Invalid System Override Key.');
+    }
+  };
+
+  // Update Profile
+  const handleProfileSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setStatus('Updating profile bio...');
+    try {
+      await axios.put(
+        `${API_URL}/api/admin/profile`,
+        {
+          name: profileName,
+          role: profileRole,
+          education: profileEducation,
+          bio: profileBio
+        },
+        { headers: { 'X-Admin-Secret': secretKey } }
+      );
+      setStatus('Profile successfully updated in database!');
+    } catch (err: any) {
+      setStatus(`Error: ${err.response?.data?.message || err.response?.data || 'Failed to update profile.'}`);
+    }
+  };
+
+  // Add Experience
+  const handleExperienceSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setStatus('Adding work experience...');
+    try {
+      await axios.post(
+        `${API_URL}/api/admin/experiences`,
+        {
+          role: expRole,
+          company: expCompany,
+          period: expPeriod,
+          description: expDescription,
+          techStack: expTechStack
+        },
+        { headers: { 'X-Admin-Secret': secretKey } }
+      );
+      setStatus('Work experience successfully saved to database!');
+      setExpRole('');
+      setExpCompany('');
+      setExpPeriod('');
+      setExpDescription('');
+      setExpTechStack('');
+    } catch (err: any) {
+      setStatus(`Error: ${err.response?.data?.message || err.response?.data || 'Failed to add experience.'}`);
+    }
+  };
+
+  // Delete Experience
+  const handleDeleteExperience = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!expDeleteId.trim()) return;
+    setStatus('Deleting experience...');
+    try {
+      await axios.delete(`${API_URL}/api/admin/experiences/${expDeleteId.trim()}`, {
+        headers: { 'X-Admin-Secret': secretKey }
+      });
+      setStatus('Experience successfully deleted!');
+      setExpDeleteId('');
+    } catch (err: any) {
+      setStatus(`Error: ${err.response?.data || 'Failed to delete experience.'}`);
     }
   };
 
@@ -164,7 +257,64 @@ const AdminDashboard = () => {
 
         <div className="flex flex-col gap-8 w-full">
           
-          {/* 1. Upload Project Form */}
+          {/* 1. Update Bio / Profile Form */}
+          <div className="w-full bg-zinc-950 p-5 sm:p-8 border border-zinc-800 rounded-xl shadow-xl">
+            <div className="flex items-center gap-2 mb-6">
+              <User className="w-5 h-5 text-zinc-400 shrink-0" />
+              <h2 className="text-base sm:text-lg font-semibold text-white">Live Profile & Bio</h2>
+            </div>
+            <form onSubmit={handleProfileSubmit} className="flex flex-col gap-4 w-full">
+              <div>
+                <label className="block text-xs font-mono text-zinc-500 mb-1">NAME</label>
+                <input type="text" placeholder="Full Name" value={profileName} onChange={(e) => setProfileName(e.target.value)} className="w-full bg-zinc-900 border border-zinc-800 text-white p-3 rounded-lg focus:border-white outline-none text-sm transition-colors" required />
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-mono text-zinc-500 mb-1">ROLE</label>
+                  <input type="text" placeholder="e.g. Backend Developer" value={profileRole} onChange={(e) => setProfileRole(e.target.value)} className="w-full bg-zinc-900 border border-zinc-800 text-white p-3 rounded-lg focus:border-white outline-none text-sm transition-colors" />
+                </div>
+                <div>
+                  <label className="block text-xs font-mono text-zinc-500 mb-1">EDUCATION</label>
+                  <input type="text" placeholder="e.g. B.Tech in CSE @ University" value={profileEducation} onChange={(e) => setProfileEducation(e.target.value)} className="w-full bg-zinc-900 border border-zinc-800 text-white p-3 rounded-lg focus:border-white outline-none text-sm transition-colors" />
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-mono text-zinc-500 mb-1">BIO / TERMINAL INTRO</label>
+                <textarea placeholder="Bio description rendered in terminal hero..." value={profileBio} onChange={(e) => setProfileBio(e.target.value)} className="w-full bg-zinc-900 border border-zinc-800 text-white p-3 rounded-lg focus:border-white outline-none text-sm h-28 resize-none transition-colors" required />
+              </div>
+              <button type="submit" className="w-full bg-white text-black font-bold py-3 rounded-lg mt-2 hover:bg-zinc-200 transition-colors">Save Profile to Database</button>
+            </form>
+          </div>
+
+          {/* 2. Add Work Experience Form */}
+          <div className="w-full bg-zinc-950 p-5 sm:p-8 border border-zinc-800 rounded-xl shadow-xl">
+            <div className="flex items-center gap-2 mb-6">
+              <Briefcase className="w-5 h-5 text-zinc-400 shrink-0" />
+              <h2 className="text-base sm:text-lg font-semibold text-white">Add Work Experience</h2>
+            </div>
+            <form onSubmit={handleExperienceSubmit} className="flex flex-col gap-4 w-full">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <input type="text" placeholder="Role (e.g. Software Engineer)" value={expRole} onChange={(e) => setExpRole(e.target.value)} className="w-full bg-zinc-900 border border-zinc-800 text-white p-3 rounded-lg focus:border-white outline-none text-sm transition-colors" required />
+                <input type="text" placeholder="Company (e.g. IIT Ropar)" value={expCompany} onChange={(e) => setExpCompany(e.target.value)} className="w-full bg-zinc-900 border border-zinc-800 text-white p-3 rounded-lg focus:border-white outline-none text-sm transition-colors" required />
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <input type="text" placeholder="Period (e.g. Jan 2026 - Present)" value={expPeriod} onChange={(e) => setExpPeriod(e.target.value)} className="w-full bg-zinc-900 border border-zinc-800 text-white p-3 rounded-lg focus:border-white outline-none text-sm transition-colors" />
+                <input type="text" placeholder="Tech Stack (comma separated: React, Java, Docker)" value={expTechStack} onChange={(e) => setExpTechStack(e.target.value)} className="w-full bg-zinc-900 border border-zinc-800 text-white p-3 rounded-lg focus:border-white outline-none text-sm transition-colors" />
+              </div>
+              <textarea placeholder="Job responsibilities and impact..." value={expDescription} onChange={(e) => setExpDescription(e.target.value)} className="w-full bg-zinc-900 border border-zinc-800 text-white p-3 rounded-lg focus:border-white outline-none text-sm h-24 resize-none transition-colors" required />
+              <button type="submit" className="w-full bg-white text-black font-bold py-3 rounded-lg mt-2 hover:bg-zinc-200 transition-colors">Add Experience to Timeline</button>
+            </form>
+
+            <div className="mt-8 pt-6 border-t border-zinc-800">
+              <h3 className="text-xs font-mono text-zinc-500 mb-2 uppercase">Delete Experience by UUID</h3>
+              <form onSubmit={handleDeleteExperience} className="flex gap-2">
+                <input type="text" placeholder="Experience UUID..." value={expDeleteId} onChange={(e) => setExpDeleteId(e.target.value)} className="flex-1 bg-zinc-900 border border-zinc-800 text-white p-2.5 rounded-lg focus:border-red-500 outline-none text-xs font-mono transition-colors" />
+                <button type="submit" className="px-4 bg-red-500/10 text-red-500 border border-red-500/50 font-bold rounded-lg hover:bg-red-500 hover:text-white transition-all text-xs">Delete</button>
+              </form>
+            </div>
+          </div>
+
+          {/* 3. Upload Project Form */}
           <div className="w-full bg-zinc-950 p-5 sm:p-8 border border-zinc-800 rounded-xl shadow-xl">
             <div className="flex items-center gap-2 mb-6">
               <UploadCloud className="w-5 h-5 text-zinc-400 shrink-0" />

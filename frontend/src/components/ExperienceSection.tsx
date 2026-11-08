@@ -1,16 +1,44 @@
+import { useState, useEffect } from 'react';
+import axios from 'axios';
 import { Briefcase } from 'lucide-react';
+import type { Experience } from '../types';
+
+const defaultExperiences: Experience[] = [
+  {
+    id: 1,
+    role: "Virtual Software Engineering Intern",
+    company: "IIT Ropar",
+    period: "Jan 2026",
+    description: "Participated in an intensive 10-week virtual internship focusing on full-stack web development.",
+    techStack: ["MongoDB", "Express.js", "React", "Node.js"]
+  }
+];
 
 const ExperienceSection = () => {
-  const experiences = [
-    {
-      id: 1,
-      role: "Virtual Software Engineering Intern",
-      company: "IIT Ropar",
-      date: "Jan 2026",
-      description: "Participated in an intensive 10-week virtual internship focusing on full-stack web development.",
-      techStack: ["MongoDB", "Express.js", "React", "Node.js"]
+  const [experiences, setExperiences] = useState<Experience[]>(defaultExperiences);
+  const API_URL = import.meta.env.VITE_API_BASE_URL;
+
+  useEffect(() => {
+    const fetchExperiences = async () => {
+      try {
+        const response = await axios.get(`${API_URL}/api/experiences`);
+        if (Array.isArray(response.data) && response.data.length > 0) {
+          setExperiences(response.data);
+        }
+      } catch (err) {
+        console.debug("Using default experiences state:", err);
+      }
+    };
+    if (API_URL) {
+      fetchExperiences();
     }
-  ];
+  }, [API_URL]);
+
+  const parseTechStack = (techStack?: string | string[]): string[] => {
+    if (!techStack) return [];
+    if (Array.isArray(techStack)) return techStack;
+    return techStack.split(',').map(t => t.trim()).filter(Boolean);
+  };
 
   return (
     // Changed min-h-[50vh] to something fluid so it doesn't force awkward empty space on small screens
@@ -35,7 +63,7 @@ const ExperienceSection = () => {
             <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-textSecondary mt-1 mb-3 sm:mb-4 font-mono">
               <span className="text-accent">{exp.company}</span>
               <span className="hidden sm:inline">|</span>
-              <span className="text-zinc-500 sm:text-textSecondary">{exp.date}</span>
+              <span className="text-zinc-500 sm:text-textSecondary">{exp.period || exp.date}</span>
             </div>
             
             <p className="text-textSecondary text-xs sm:text-sm leading-relaxed mb-4 w-full max-w-2xl break-words">
@@ -43,7 +71,7 @@ const ExperienceSection = () => {
             </p>
             
             <div className="flex flex-wrap gap-2">
-              {exp.techStack.map((tech, index) => (
+              {parseTechStack(exp.techStack).map((tech, index) => (
                 <span key={index} className="px-2 py-1 text-[10px] sm:text-xs font-mono text-textSecondary bg-surface border border-zinc-800 rounded break-words">
                   {tech}
                 </span>
