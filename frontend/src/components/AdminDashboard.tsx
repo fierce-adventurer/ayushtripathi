@@ -1,19 +1,10 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { Lock, Unlock, FileText, Briefcase, FolderGit2, User, Sparkles } from 'lucide-react';
+import { Lock, Unlock, FileText, Briefcase, FolderGit2 } from 'lucide-react';
 
 const AdminDashboard = () => {
   const [secretKey, setSecretKey] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  // Profile form state
-  const [profileName, setProfileName] = useState('');
-  const [profileRole, setProfileRole] = useState('');
-  const [profileEducation, setProfileEducation] = useState('');
-  const [profileBio, setProfileBio] = useState('');
-  const [profileResumeUrl, setProfileResumeUrl] = useState('');
-  const [profileGithubUrl, setProfileGithubUrl] = useState('');
-  const [profileLinkedinUrl, setProfileLinkedinUrl] = useState('');
 
   // Project form state
   const [projectTitle, setProjectTitle] = useState('');
@@ -40,23 +31,6 @@ const AdminDashboard = () => {
   // Status messages
   const [status, setStatus] = useState('');
 
-  const loadProfile = async () => {
-    try {
-      const res = await axios.get(`${API_URL}/api/profile`);
-      if (res.data) {
-        setProfileName(res.data.name || '');
-        setProfileRole(res.data.role || '');
-        setProfileEducation(res.data.education || '');
-        setProfileBio(res.data.bio || '');
-        setProfileResumeUrl(res.data.resumeUrl || '');
-        setProfileGithubUrl(res.data.githubUrl || '');
-        setProfileLinkedinUrl(res.data.linkedinUrl || '');
-      }
-    } catch (err) {
-      console.debug("Could not pre-fetch profile", err);
-    }
-  };
-
   // Authentication
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,51 +39,8 @@ const AdminDashboard = () => {
     if (secretKey === correctKey) {
       setIsAuthenticated(true);
       setStatus('');
-      loadProfile();
     } else {
       setStatus('ACCESS DENIED: Invalid System Override Key.');
-    }
-  };
-
-  // Save Profile & Bio
-  const handleProfileSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setStatus('Updating profile bio in database...');
-    try {
-      await axios.put(
-        `${API_URL}/api/admin/profile`,
-        {
-          name: profileName,
-          role: profileRole,
-          education: profileEducation,
-          bio: profileBio,
-          resumeUrl: profileResumeUrl,
-          githubUrl: profileGithubUrl,
-          linkedinUrl: profileLinkedinUrl
-        },
-        { headers: { 'X-Admin-Secret': secretKey } }
-      );
-      setStatus('Profile & bio successfully saved to database!');
-    } catch (err: any) {
-      setStatus(`Error: ${err.response?.data?.message || err.response?.data || 'Failed to update profile.'}`);
-    }
-  };
-
-  // Generate Bio with AI
-  const handleGenerateBio = async () => {
-    setStatus('Generating fresh bio with Groq AI...');
-    try {
-      const res = await axios.post(
-        `${API_URL}/api/admin/profile/generate-bio`,
-        {},
-        { headers: { 'X-Admin-Secret': secretKey } }
-      );
-      if (res.data && res.data.bio) {
-        setProfileBio(res.data.bio);
-        setStatus('✨ Bio generated and saved to database!');
-      }
-    } catch (err: any) {
-      setStatus(`Error: ${err.response?.data?.message || err.response?.data || 'Failed to generate bio with AI.'}`);
     }
   };
 
@@ -231,8 +162,6 @@ const AdminDashboard = () => {
       });
       setStatus(res.data || 'Resume successfully embedded and dynamic bio updated!');
       setFile(null);
-      // Automatically refresh the profile and bio in the dashboard
-      await loadProfile();
     } catch (err: any) {
       setStatus(`Error: ${err.response?.data || 'Failed to ingest PDF'}`);
     }
@@ -296,61 +225,8 @@ const AdminDashboard = () => {
         )}
 
         <div className="flex flex-col gap-8 w-full">
-          
-          {/* 1. Live Profile & Bio Card */}
-          <div className="w-full bg-zinc-950 p-5 sm:p-8 border border-zinc-800 rounded-xl shadow-xl">
-            <div className="flex items-center gap-2 mb-6">
-              <User className="w-5 h-5 text-zinc-400 shrink-0" />
-              <h2 className="text-base sm:text-lg font-semibold text-white">Live Profile &amp; Terminal Bio</h2>
-            </div>
-            <form onSubmit={handleProfileSubmit} className="flex flex-col gap-4 w-full">
-              <div>
-                <label className="block text-xs font-mono text-zinc-500 mb-1">NAME</label>
-                <input type="text" placeholder="Full Name" value={profileName} onChange={(e) => setProfileName(e.target.value)} className="w-full bg-zinc-900 border border-zinc-800 text-white p-3 rounded-lg focus:border-white outline-none text-sm transition-colors" required />
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-mono text-zinc-500 mb-1">ROLE</label>
-                  <input type="text" placeholder="e.g. Backend Developer" value={profileRole} onChange={(e) => setProfileRole(e.target.value)} className="w-full bg-zinc-900 border border-zinc-800 text-white p-3 rounded-lg focus:border-white outline-none text-sm transition-colors" />
-                </div>
-                <div>
-                  <label className="block text-xs font-mono text-zinc-500 mb-1">EDUCATION</label>
-                  <input type="text" placeholder="e.g. B.Tech in CSE @ University" value={profileEducation} onChange={(e) => setProfileEducation(e.target.value)} className="w-full bg-zinc-900 border border-zinc-800 text-white p-3 rounded-lg focus:border-white outline-none text-sm transition-colors" />
-                </div>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-xs font-mono text-zinc-500 mb-1">RESUME URL</label>
-                  <input type="text" placeholder="Google Drive or direct PDF link" value={profileResumeUrl} onChange={(e) => setProfileResumeUrl(e.target.value)} className="w-full bg-zinc-900 border border-zinc-800 text-white p-3 rounded-lg focus:border-white outline-none text-xs font-mono transition-colors" />
-                </div>
-                <div>
-                  <label className="block text-xs font-mono text-zinc-500 mb-1">GITHUB URL</label>
-                  <input type="text" placeholder="https://github.com/..." value={profileGithubUrl} onChange={(e) => setProfileGithubUrl(e.target.value)} className="w-full bg-zinc-900 border border-zinc-800 text-white p-3 rounded-lg focus:border-white outline-none text-xs font-mono transition-colors" />
-                </div>
-                <div>
-                  <label className="block text-xs font-mono text-zinc-500 mb-1">LINKEDIN URL</label>
-                  <input type="text" placeholder="https://linkedin.com/in/..." value={profileLinkedinUrl} onChange={(e) => setProfileLinkedinUrl(e.target.value)} className="w-full bg-zinc-900 border border-zinc-800 text-white p-3 rounded-lg focus:border-white outline-none text-xs font-mono transition-colors" />
-                </div>
-              </div>
-              <div>
-                <div className="flex items-center justify-between mb-1">
-                  <label className="block text-xs font-mono text-zinc-500">TERMINAL HERO BIO</label>
-                  <button 
-                    type="button" 
-                    onClick={handleGenerateBio} 
-                    className="text-xs font-mono text-cyan-400 hover:text-cyan-300 transition-colors flex items-center gap-1 cursor-pointer"
-                  >
-                    <Sparkles className="w-3.5 h-3.5" />
-                    Regenerate Bio with Groq AI
-                  </button>
-                </div>
-                <textarea placeholder="Bio description rendered on the terminal hero..." value={profileBio} onChange={(e) => setProfileBio(e.target.value)} className="w-full bg-zinc-900 border border-zinc-800 text-white p-3 rounded-lg focus:border-white outline-none text-sm h-28 resize-none transition-colors" required />
-              </div>
-              <button type="submit" className="w-full bg-white text-black font-bold py-3 rounded-lg mt-2 hover:bg-zinc-200 transition-colors cursor-pointer">Save Profile &amp; Bio to Database</button>
-            </form>
-          </div>
 
-          {/* 2. Manual Project Management Card */}
+          {/* 1. Manual Project Management Card */}
           <div className="w-full bg-zinc-950 p-5 sm:p-8 border border-zinc-800 rounded-xl shadow-xl">
             <div className="flex items-center gap-2 mb-6">
               <FolderGit2 className="w-5 h-5 text-zinc-400 shrink-0" />
@@ -376,7 +252,7 @@ const AdminDashboard = () => {
             </div>
           </div>
 
-          {/* 3. Add Work Experience Form */}
+          {/* 2. Add Work Experience Form */}
           <div className="w-full bg-zinc-950 p-5 sm:p-8 border border-zinc-800 rounded-xl shadow-xl">
             <div className="flex items-center gap-2 mb-6">
               <Briefcase className="w-5 h-5 text-zinc-400 shrink-0" />
@@ -413,7 +289,7 @@ const AdminDashboard = () => {
             </div>
           </div>
 
-          {/* 4. AI Resume Ingestion Form */}
+          {/* 3. AI Resume Ingestion Form */}
           <div className="w-full bg-zinc-950 p-5 sm:p-8 border border-zinc-800 rounded-xl shadow-xl">
             <div className="flex items-center gap-2 mb-6">
               <FileText className="w-5 h-5 text-zinc-400 shrink-0" />
