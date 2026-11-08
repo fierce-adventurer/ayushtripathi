@@ -1,10 +1,27 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { Lock, Unlock, FileText, Briefcase } from 'lucide-react';
+import { Lock, Unlock, FileText, Briefcase, FolderGit2, User, Sparkles } from 'lucide-react';
 
 const AdminDashboard = () => {
   const [secretKey, setSecretKey] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  // Profile form state
+  const [profileName, setProfileName] = useState('');
+  const [profileRole, setProfileRole] = useState('');
+  const [profileEducation, setProfileEducation] = useState('');
+  const [profileBio, setProfileBio] = useState('');
+  const [profileResumeUrl, setProfileResumeUrl] = useState('');
+  const [profileGithubUrl, setProfileGithubUrl] = useState('');
+  const [profileLinkedinUrl, setProfileLinkedinUrl] = useState('');
+
+  // Project form state
+  const [projectTitle, setProjectTitle] = useState('');
+  const [projectDesc, setProjectDesc] = useState('');
+  const [projectTech, setProjectTech] = useState('');
+  const [projectGithub, setProjectGithub] = useState('');
+  const [projectLive, setProjectLive] = useState('');
+  const [projectDeleteId, setProjectDeleteId] = useState('');
 
   // Experience form state
   const [expRole, setExpRole] = useState('');
@@ -14,7 +31,7 @@ const AdminDashboard = () => {
   const [expTechStack, setExpTechStack] = useState('');
   const [expDeleteId, setExpDeleteId] = useState('');
 
-  // Use an environment variable with a fallback
+  // API base URL
   const API_URL = import.meta.env.VITE_API_BASE_URL;
 
   // Resume file state
@@ -22,6 +39,23 @@ const AdminDashboard = () => {
 
   // Status messages
   const [status, setStatus] = useState('');
+
+  const loadProfile = async () => {
+    try {
+      const res = await axios.get(`${API_URL}/api/profile`);
+      if (res.data) {
+        setProfileName(res.data.name || '');
+        setProfileRole(res.data.role || '');
+        setProfileEducation(res.data.education || '');
+        setProfileBio(res.data.bio || '');
+        setProfileResumeUrl(res.data.resumeUrl || '');
+        setProfileGithubUrl(res.data.githubUrl || '');
+        setProfileLinkedinUrl(res.data.linkedinUrl || '');
+      }
+    } catch (err) {
+      console.debug("Could not pre-fetch profile", err);
+    }
+  };
 
   // Authentication
   const handleLogin = (e: React.FormEvent) => {
@@ -31,8 +65,94 @@ const AdminDashboard = () => {
     if (secretKey === correctKey) {
       setIsAuthenticated(true);
       setStatus('');
+      loadProfile();
     } else {
       setStatus('ACCESS DENIED: Invalid System Override Key.');
+    }
+  };
+
+  // Save Profile & Bio
+  const handleProfileSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setStatus('Updating profile bio in database...');
+    try {
+      await axios.put(
+        `${API_URL}/api/admin/profile`,
+        {
+          name: profileName,
+          role: profileRole,
+          education: profileEducation,
+          bio: profileBio,
+          resumeUrl: profileResumeUrl,
+          githubUrl: profileGithubUrl,
+          linkedinUrl: profileLinkedinUrl
+        },
+        { headers: { 'X-Admin-Secret': secretKey } }
+      );
+      setStatus('Profile & bio successfully saved to database!');
+    } catch (err: any) {
+      setStatus(`Error: ${err.response?.data?.message || err.response?.data || 'Failed to update profile.'}`);
+    }
+  };
+
+  // Generate Bio with AI
+  const handleGenerateBio = async () => {
+    setStatus('Generating fresh bio with Groq AI...');
+    try {
+      const res = await axios.post(
+        `${API_URL}/api/admin/profile/generate-bio`,
+        {},
+        { headers: { 'X-Admin-Secret': secretKey } }
+      );
+      if (res.data && res.data.bio) {
+        setProfileBio(res.data.bio);
+        setStatus('✨ Bio generated and saved to database!');
+      }
+    } catch (err: any) {
+      setStatus(`Error: ${err.response?.data?.message || err.response?.data || 'Failed to generate bio with AI.'}`);
+    }
+  };
+
+  // Add Manual Project
+  const handleProjectSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setStatus('Deploying project module to database...');
+    try {
+      await axios.post(
+        `${API_URL}/api/admin/projects`,
+        {
+          title: projectTitle,
+          description: projectDesc,
+          techStack: projectTech,
+          githubUrl: projectGithub,
+          liveUrl: projectLive
+        },
+        { headers: { 'X-Admin-Secret': secretKey } }
+      );
+      setStatus(`Project "${projectTitle}" successfully deployed to database!`);
+      setProjectTitle('');
+      setProjectDesc('');
+      setProjectTech('');
+      setProjectGithub('');
+      setProjectLive('');
+    } catch (err: any) {
+      setStatus(`Error: ${err.response?.data?.message || err.response?.data || 'Failed to deploy project.'}`);
+    }
+  };
+
+  // Delete Project by UUID
+  const handleDeleteProject = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!projectDeleteId.trim()) return;
+    setStatus('Deleting project from database...');
+    try {
+      await axios.delete(`${API_URL}/api/admin/projects/${projectDeleteId.trim()}`, {
+        headers: { 'X-Admin-Secret': secretKey }
+      });
+      setStatus('Project successfully deleted!');
+      setProjectDeleteId('');
+    } catch (err: any) {
+      setStatus(`Error: ${err.response?.data || 'Failed to delete project.'}`);
     }
   };
 
@@ -98,19 +218,21 @@ const AdminDashboard = () => {
     e.preventDefault();
     if (!file) return;
 
-    setStatus('Chunking and embedding PDF... This may take a moment.');
+    setStatus('Chunking, embedding into pgvector, and generating bio with AI...');
     const formData = new FormData();
     formData.append('file', file);
 
     try {
-      await axios.post(`${API_URL}/api/admin/ingest`, formData, {
+      const res = await axios.post(`${API_URL}/api/admin/ingest`, formData, {
         headers: {
           'X-Admin-Secret': secretKey,
           'Content-Type': 'multipart/form-data'
         }
       });
-      setStatus('PDF successfully ingested into pgvector!');
+      setStatus(res.data || 'Resume successfully embedded and dynamic bio updated!');
       setFile(null);
+      // Automatically refresh the profile and bio in the dashboard
+      await loadProfile();
     } catch (err: any) {
       setStatus(`Error: ${err.response?.data || 'Failed to ingest PDF'}`);
     }
@@ -119,7 +241,6 @@ const AdminDashboard = () => {
   // UI: Lock Screen
   if (!isAuthenticated) {
     return (
-      // Added a full-screen wrapper with padding so it never touches the screen edges on mobile
       <div className="min-h-screen w-full flex flex-col items-center justify-center px-4 sm:px-6 py-12">
         <div className="w-full max-w-md bg-zinc-950 p-6 sm:p-8 border border-zinc-800 rounded-xl shadow-2xl">
           <div className="flex flex-col items-center mb-6 text-center">
@@ -154,7 +275,6 @@ const AdminDashboard = () => {
 
   // UI: The Admin Control Panel
   return (
-    // Added a master wrapper for the dashboard to constrain width and manage padding on all devices
     <div className="min-h-screen w-full px-4 sm:px-6 md:px-8 py-12 flex flex-col items-center">
       <div className="w-full max-w-2xl pb-24">
         
@@ -177,11 +297,90 @@ const AdminDashboard = () => {
 
         <div className="flex flex-col gap-8 w-full">
           
-          {/* 1. Add Work Experience Form */}
+          {/* 1. Live Profile & Bio Card */}
+          <div className="w-full bg-zinc-950 p-5 sm:p-8 border border-zinc-800 rounded-xl shadow-xl">
+            <div className="flex items-center gap-2 mb-6">
+              <User className="w-5 h-5 text-zinc-400 shrink-0" />
+              <h2 className="text-base sm:text-lg font-semibold text-white">Live Profile &amp; Terminal Bio</h2>
+            </div>
+            <form onSubmit={handleProfileSubmit} className="flex flex-col gap-4 w-full">
+              <div>
+                <label className="block text-xs font-mono text-zinc-500 mb-1">NAME</label>
+                <input type="text" placeholder="Full Name" value={profileName} onChange={(e) => setProfileName(e.target.value)} className="w-full bg-zinc-900 border border-zinc-800 text-white p-3 rounded-lg focus:border-white outline-none text-sm transition-colors" required />
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-mono text-zinc-500 mb-1">ROLE</label>
+                  <input type="text" placeholder="e.g. Backend Developer" value={profileRole} onChange={(e) => setProfileRole(e.target.value)} className="w-full bg-zinc-900 border border-zinc-800 text-white p-3 rounded-lg focus:border-white outline-none text-sm transition-colors" />
+                </div>
+                <div>
+                  <label className="block text-xs font-mono text-zinc-500 mb-1">EDUCATION</label>
+                  <input type="text" placeholder="e.g. B.Tech in CSE @ University" value={profileEducation} onChange={(e) => setProfileEducation(e.target.value)} className="w-full bg-zinc-900 border border-zinc-800 text-white p-3 rounded-lg focus:border-white outline-none text-sm transition-colors" />
+                </div>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-xs font-mono text-zinc-500 mb-1">RESUME URL</label>
+                  <input type="text" placeholder="Google Drive or direct PDF link" value={profileResumeUrl} onChange={(e) => setProfileResumeUrl(e.target.value)} className="w-full bg-zinc-900 border border-zinc-800 text-white p-3 rounded-lg focus:border-white outline-none text-xs font-mono transition-colors" />
+                </div>
+                <div>
+                  <label className="block text-xs font-mono text-zinc-500 mb-1">GITHUB URL</label>
+                  <input type="text" placeholder="https://github.com/..." value={profileGithubUrl} onChange={(e) => setProfileGithubUrl(e.target.value)} className="w-full bg-zinc-900 border border-zinc-800 text-white p-3 rounded-lg focus:border-white outline-none text-xs font-mono transition-colors" />
+                </div>
+                <div>
+                  <label className="block text-xs font-mono text-zinc-500 mb-1">LINKEDIN URL</label>
+                  <input type="text" placeholder="https://linkedin.com/in/..." value={profileLinkedinUrl} onChange={(e) => setProfileLinkedinUrl(e.target.value)} className="w-full bg-zinc-900 border border-zinc-800 text-white p-3 rounded-lg focus:border-white outline-none text-xs font-mono transition-colors" />
+                </div>
+              </div>
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-xs font-mono text-zinc-500">TERMINAL HERO BIO</label>
+                  <button 
+                    type="button" 
+                    onClick={handleGenerateBio} 
+                    className="text-xs font-mono text-cyan-400 hover:text-cyan-300 transition-colors flex items-center gap-1 cursor-pointer"
+                  >
+                    <Sparkles className="w-3.5 h-3.5" />
+                    Regenerate Bio with Groq AI
+                  </button>
+                </div>
+                <textarea placeholder="Bio description rendered on the terminal hero..." value={profileBio} onChange={(e) => setProfileBio(e.target.value)} className="w-full bg-zinc-900 border border-zinc-800 text-white p-3 rounded-lg focus:border-white outline-none text-sm h-28 resize-none transition-colors" required />
+              </div>
+              <button type="submit" className="w-full bg-white text-black font-bold py-3 rounded-lg mt-2 hover:bg-zinc-200 transition-colors cursor-pointer">Save Profile &amp; Bio to Database</button>
+            </form>
+          </div>
+
+          {/* 2. Manual Project Management Card */}
+          <div className="w-full bg-zinc-950 p-5 sm:p-8 border border-zinc-800 rounded-xl shadow-xl">
+            <div className="flex items-center gap-2 mb-6">
+              <FolderGit2 className="w-5 h-5 text-zinc-400 shrink-0" />
+              <h2 className="text-base sm:text-lg font-semibold text-white">Manual Project Management</h2>
+            </div>
+            <form onSubmit={handleProjectSubmit} className="flex flex-col gap-4 w-full">
+              <input type="text" placeholder="Project Title (e.g. Distributed Task Queue)" value={projectTitle} onChange={(e) => setProjectTitle(e.target.value)} className="w-full bg-zinc-900 border border-zinc-800 text-white p-3 rounded-lg focus:border-white outline-none text-sm transition-colors" required />
+              <textarea placeholder="Detailed project description and architecture highlights..." value={projectDesc} onChange={(e) => setProjectDesc(e.target.value)} className="w-full bg-zinc-900 border border-zinc-800 text-white p-3 rounded-lg focus:border-white outline-none text-sm h-24 resize-none transition-colors" required />
+              <input type="text" placeholder="Tech Stack (comma-separated: Java, Spring Boot, Kafka, Docker)" value={projectTech} onChange={(e) => setProjectTech(e.target.value)} className="w-full bg-zinc-900 border border-zinc-800 text-white p-3 rounded-lg focus:border-white outline-none text-sm transition-colors" />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <input type="text" placeholder="GitHub Repository URL" value={projectGithub} onChange={(e) => setProjectGithub(e.target.value)} className="w-full bg-zinc-900 border border-zinc-800 text-white p-3 rounded-lg focus:border-white outline-none text-sm transition-colors" />
+                <input type="text" placeholder="Live Demo / Build URL (optional)" value={projectLive} onChange={(e) => setProjectLive(e.target.value)} className="w-full bg-zinc-900 border border-zinc-800 text-white p-3 rounded-lg focus:border-white outline-none text-sm transition-colors" />
+              </div>
+              <button type="submit" className="w-full bg-white text-black font-bold py-3 rounded-lg mt-2 hover:bg-zinc-200 transition-colors cursor-pointer">Deploy Project to Main Page</button>
+            </form>
+
+            <div className="mt-8 pt-6 border-t border-zinc-800">
+              <h3 className="text-xs font-mono text-zinc-500 uppercase mb-2">Delete Project by UUID</h3>
+              <form onSubmit={handleDeleteProject} className="flex gap-2">
+                <input type="text" placeholder="Project UUID..." value={projectDeleteId} onChange={(e) => setProjectDeleteId(e.target.value)} className="flex-1 bg-zinc-900 border border-zinc-800 text-white p-2.5 rounded-lg focus:border-red-500 outline-none text-xs font-mono transition-colors" />
+                <button type="submit" className="px-4 bg-red-500/10 text-red-500 border border-red-500/50 font-bold rounded-lg hover:bg-red-500 hover:text-white transition-all text-xs cursor-pointer">Delete</button>
+              </form>
+            </div>
+          </div>
+
+          {/* 3. Add Work Experience Form */}
           <div className="w-full bg-zinc-950 p-5 sm:p-8 border border-zinc-800 rounded-xl shadow-xl">
             <div className="flex items-center gap-2 mb-6">
               <Briefcase className="w-5 h-5 text-zinc-400 shrink-0" />
-              <h2 className="text-base sm:text-lg font-semibold text-white">Add Work Experience</h2>
+              <h2 className="text-base sm:text-lg font-semibold text-white">Work Experience</h2>
             </div>
             <form onSubmit={handleExperienceSubmit} className="flex flex-col gap-4 w-full">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -193,7 +392,7 @@ const AdminDashboard = () => {
                 <input type="text" placeholder="Tech Stack (comma separated: React, Java, Docker)" value={expTechStack} onChange={(e) => setExpTechStack(e.target.value)} className="w-full bg-zinc-900 border border-zinc-800 text-white p-3 rounded-lg focus:border-white outline-none text-sm transition-colors" />
               </div>
               <textarea placeholder="Job responsibilities and impact..." value={expDescription} onChange={(e) => setExpDescription(e.target.value)} className="w-full bg-zinc-900 border border-zinc-800 text-white p-3 rounded-lg focus:border-white outline-none text-sm h-24 resize-none transition-colors" required />
-              <button type="submit" className="w-full bg-white text-black font-bold py-3 rounded-lg mt-2 hover:bg-zinc-200 transition-colors">Add Experience to Timeline</button>
+              <button type="submit" className="w-full bg-white text-black font-bold py-3 rounded-lg mt-2 hover:bg-zinc-200 transition-colors cursor-pointer">Add Experience to Timeline</button>
             </form>
 
             <div className="mt-8 pt-6 border-t border-zinc-800">
@@ -209,21 +408,22 @@ const AdminDashboard = () => {
               </div>
               <form onSubmit={handleDeleteExperience} className="flex gap-2">
                 <input type="text" placeholder="Experience UUID..." value={expDeleteId} onChange={(e) => setExpDeleteId(e.target.value)} className="flex-1 bg-zinc-900 border border-zinc-800 text-white p-2.5 rounded-lg focus:border-red-500 outline-none text-xs font-mono transition-colors" />
-                <button type="submit" className="px-4 bg-red-500/10 text-red-500 border border-red-500/50 font-bold rounded-lg hover:bg-red-500 hover:text-white transition-all text-xs">Delete</button>
+                <button type="submit" className="px-4 bg-red-500/10 text-red-500 border border-red-500/50 font-bold rounded-lg hover:bg-red-500 hover:text-white transition-all text-xs cursor-pointer">Delete</button>
               </form>
             </div>
           </div>
 
-          {/* 2. AI Resume Ingestion Form */}
+          {/* 4. AI Resume Ingestion Form */}
           <div className="w-full bg-zinc-950 p-5 sm:p-8 border border-zinc-800 rounded-xl shadow-xl">
             <div className="flex items-center gap-2 mb-6">
               <FileText className="w-5 h-5 text-zinc-400 shrink-0" />
               <h2 className="text-base sm:text-lg font-semibold text-white">AI Memory Ingestion</h2>
             </div>
             <form onSubmit={handlePdfSubmit} className="flex flex-col gap-4 w-full">
-              <p className="text-xs sm:text-sm text-zinc-400 mb-2 leading-relaxed">Upload your latest PDF resume. The backend will parse, chunk, and update the pgvector database for your AI agent.</p>
+              <p className="text-xs sm:text-sm text-zinc-400 mb-2 leading-relaxed">
+                Upload your latest PDF resume. The backend will parse, chunk, and embed it into pgvector, extract work experiences, and synthesize a dynamic bio for your portfolio.
+              </p>
               
-              {/* Added overflow-hidden and text-ellipsis so long file names don't stretch the container */}
               <input 
                 type="file" 
                 accept=".pdf"
@@ -231,7 +431,9 @@ const AdminDashboard = () => {
                 className="w-full max-w-full overflow-hidden text-ellipsis text-xs sm:text-sm text-zinc-400 file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-xs sm:file:text-sm file:font-semibold file:bg-white file:text-black hover:file:bg-zinc-200 transition-all cursor-pointer"
                 required 
               />
-              <button type="submit" className="w-full border border-white text-white font-bold py-3 rounded-lg mt-2 hover:bg-white hover:text-black transition-colors">Embed PDF</button>
+              <button type="submit" className="w-full border border-white text-white font-bold py-3 rounded-lg mt-2 hover:bg-white hover:text-black transition-colors cursor-pointer">
+                Embed PDF &amp; Update AI Memory
+              </button>
             </form>
           </div>
 

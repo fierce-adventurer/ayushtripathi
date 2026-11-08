@@ -15,7 +15,32 @@ const MetricsSection = () => {
     github: { repos: null, loading: true }
   });
 
+  const [profileLinks, setProfileLinks] = useState({
+    githubUrl: 'https://github.com/fierce-adventurer',
+    leetcodeUrl: 'https://leetcode.com/u/ayushtripathi2005/',
+    codeforcesUrl: 'https://codeforces.com/profile/fierce-adventurer',
+    linkedinUrl: 'https://www.linkedin.com/in/ayush-tripathi-89265923a/',
+    resumeUrl: 'https://drive.google.com/file/d/1mkDrr9xYSplGzt3btQkSZnR-FzJvXJgq/view?usp=drive_link'
+  });
+
   useEffect(() => {
+    const API_URL = import.meta.env.VITE_API_BASE_URL;
+    if (API_URL) {
+      axios.get(`${API_URL}/api/profile`)
+        .then(res => {
+          if (res.data) {
+            setProfileLinks(prev => ({
+              githubUrl: res.data.githubUrl || prev.githubUrl,
+              leetcodeUrl: res.data.leetcodeUrl || prev.leetcodeUrl,
+              codeforcesUrl: res.data.codeforcesUrl || prev.codeforcesUrl,
+              linkedinUrl: res.data.linkedinUrl || prev.linkedinUrl,
+              resumeUrl: res.data.resumeUrl || prev.resumeUrl
+            }));
+          }
+        })
+        .catch(err => console.debug("Metrics profile fetch fallback:", err));
+    }
+
     axios.get('https://api.github.com/users/fierce-adventurer', {
       headers: { 'Accept': 'application/vnd.github.v3+json' }
     })
@@ -70,7 +95,7 @@ const MetricsSection = () => {
       {/* Adjusted grid for better tablet/mobile scaling */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 w-full">
         
-        <a href="https://github.com/fierce-adventurer" target="_blank" rel="noreferrer" className="group flex flex-col items-center justify-center p-4 sm:p-6 bg-zinc-950 border border-zinc-800 rounded-2xl hover:border-white transition-all duration-300 w-full min-w-0">
+        <a href={profileLinks.githubUrl} target="_blank" rel="noreferrer" className="group flex flex-col items-center justify-center p-4 sm:p-6 bg-zinc-950 border border-zinc-800 rounded-2xl hover:border-white transition-all duration-300 w-full min-w-0">
           <Github className="w-6 h-6 sm:w-7 sm:h-7 text-zinc-500 group-hover:text-white mb-2 sm:mb-3 transition-colors shrink-0" />
           <span className="text-[10px] sm:text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Source</span>
           <span className="text-xs sm:text-sm font-mono text-white text-center break-words">
@@ -78,7 +103,7 @@ const MetricsSection = () => {
           </span>
         </a>
 
-        <a href="https://leetcode.com/u/ayushtripathi2005/" target="_blank" rel="noreferrer" className="group flex flex-col items-center justify-center p-4 sm:p-6 bg-zinc-950 border border-zinc-800 rounded-2xl hover:border-white transition-all duration-300 w-full min-w-0">
+        <a href={profileLinks.leetcodeUrl} target="_blank" rel="noreferrer" className="group flex flex-col items-center justify-center p-4 sm:p-6 bg-zinc-950 border border-zinc-800 rounded-2xl hover:border-white transition-all duration-300 w-full min-w-0">
           <Code2 className="w-6 h-6 sm:w-7 sm:h-7 text-zinc-500 group-hover:text-white mb-2 sm:mb-3 transition-colors shrink-0" />
           <span className="text-[10px] sm:text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1 truncate max-w-full">LEETCODE</span>
           <span className="text-xs sm:text-sm font-mono text-white text-center break-words">
@@ -86,7 +111,7 @@ const MetricsSection = () => {
           </span>
         </a>
 
-        <a href="https://codeforces.com/profile/fierce-adventurer" target="_blank" rel="noreferrer" className="group flex flex-col items-center justify-center p-4 sm:p-6 bg-zinc-950 border border-zinc-800 rounded-2xl hover:border-white transition-all duration-300 w-full min-w-0">
+        <a href={profileLinks.codeforcesUrl} target="_blank" rel="noreferrer" className="group flex flex-col items-center justify-center p-4 sm:p-6 bg-zinc-950 border border-zinc-800 rounded-2xl hover:border-white transition-all duration-300 w-full min-w-0">
           <Terminal className="w-6 h-6 sm:w-7 sm:h-7 text-zinc-500 group-hover:text-white mb-2 sm:mb-3 transition-colors shrink-0" />
           <span className="text-[10px] sm:text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1 truncate max-w-full">CP_Rating</span>
           <span className="text-xs sm:text-sm font-mono text-white text-center break-words">
@@ -94,13 +119,13 @@ const MetricsSection = () => {
           </span>
         </a>
 
-        <a href="https://www.linkedin.com/in/ayush-tripathi-89265923a/" target="_blank" rel="noreferrer" className="group flex flex-col items-center justify-center p-4 sm:p-6 bg-zinc-950 border border-zinc-800 rounded-2xl hover:border-white transition-all duration-300 w-full min-w-0">
+        <a href={profileLinks.linkedinUrl} target="_blank" rel="noreferrer" className="group flex flex-col items-center justify-center p-4 sm:p-6 bg-zinc-950 border border-zinc-800 rounded-2xl hover:border-white transition-all duration-300 w-full min-w-0">
           <Linkedin className="w-6 h-6 sm:w-7 sm:h-7 text-zinc-500 group-hover:text-white mb-2 sm:mb-3 transition-colors shrink-0" />
           <span className="text-[10px] sm:text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Connect</span>
           <span className="text-xs sm:text-sm font-mono text-white text-center break-words">LinkedIn</span>
         </a>
 
-        <a href="https://drive.google.com/file/d/1mkDrr9xYSplGzt3btQkSZnR-FzJvXJgq/view?usp=drive_link" target="_blank" rel="noreferrer" className="group flex flex-col items-center justify-center p-4 sm:p-6 bg-zinc-950 border border-zinc-800 rounded-2xl hover:border-white transition-all duration-300 w-full min-w-0">
+        <a href={profileLinks.resumeUrl} target="_blank" rel="noreferrer" className="group flex flex-col items-center justify-center p-4 sm:p-6 bg-zinc-950 border border-zinc-800 rounded-2xl hover:border-white transition-all duration-300 w-full min-w-0">
           <FileDown className="w-6 h-6 sm:w-7 sm:h-7 text-zinc-500 group-hover:text-white mb-2 sm:mb-3 transition-colors shrink-0" />
           <span className="text-[10px] sm:text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Payload</span>
           <span className="text-xs sm:text-sm font-mono text-white text-center break-words">Resume.pdf</span>

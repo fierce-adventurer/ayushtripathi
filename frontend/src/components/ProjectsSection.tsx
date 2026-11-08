@@ -25,35 +25,13 @@ const ProjectsSection = () => {
       try {
         if (API_URL) {
           const response = await axios.get(`${API_URL}/api/projects`);
-          if (Array.isArray(response.data) && response.data.length > 0) {
+          if (Array.isArray(response.data)) {
             setProjects(response.data);
-            setLoading(false);
-            return;
           }
         }
       } catch (err) {
-        console.warn("Backend project fetch failed, falling back to direct GitHub API:", err);
-      }
-
-      // Direct GitHub API fallback
-      try {
-        const ghRes = await axios.get('https://api.github.com/users/fierce-adventurer/repos?sort=updated&per_page=100');
-        if (Array.isArray(ghRes.data)) {
-          const mapped: Project[] = ghRes.data
-            .filter((repo: any) => !repo.fork)
-            .map((repo: any) => ({
-              id: String(repo.id),
-              title: repo.name,
-              description: repo.description || 'Public GitHub repository module.',
-              techStack: repo.language || 'GitHub Repository',
-              githubUrl: repo.html_url,
-              liveUrl: repo.homepage || null
-            }));
-          setProjects(mapped);
-        }
-      } catch (ghErr) {
-        console.error("Direct GitHub API fetch error:", ghErr);
-        setError('Failed to fetch repositories from GitHub API.');
+        console.error("Project fetch error:", err);
+        setError('Failed to fetch projects from database.');
       } finally {
         setLoading(false);
       }
@@ -74,7 +52,7 @@ const ProjectsSection = () => {
   if (loading) {
     return (
       <div className="w-full font-mono text-textSecondary text-sm animate-pulse min-h-[30vh]">
-        &gt; SYSTEM: Fetching live repositories from GitHub API...
+        &gt; SYSTEM: Loading active modules from memory...
       </div>
     );
   }

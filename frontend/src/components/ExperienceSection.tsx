@@ -13,12 +13,7 @@ const ExperienceSection = () => {
       try {
         const response = await axios.get(`${API_URL}/api/experiences`);
         if (Array.isArray(response.data)) {
-          const filtered = response.data.filter((e: any) => {
-            const companyMatch = e.company?.toLowerCase().includes('iit ropar');
-            const roleMatch = e.role?.toLowerCase().includes('virtual software engineering');
-            return !companyMatch && !roleMatch;
-          });
-          setExperiences(filtered);
+          setExperiences(response.data);
         }
       } catch (err) {
         console.debug("Could not fetch experiences:", err);
