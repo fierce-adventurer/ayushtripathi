@@ -183,40 +183,49 @@ const ChatModal = () => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 sm:p-8 bg-black/60 backdrop-blur-sm">
+    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 sm:p-8 bg-black/70 backdrop-blur-md">
       <div className="absolute inset-0 cursor-pointer" onClick={() => setIsOpen(false)}></div>
       
-      <div className="relative w-full max-w-3xl flex flex-col bg-zinc-950 border border-zinc-800 rounded-2xl overflow-hidden shadow-2xl h-[85vh] max-h-[800px] z-10 animate-in fade-in zoom-in duration-200">
+      <div className="relative w-full max-w-3xl flex flex-col bg-[#120D24] border border-purple-500/30 rounded-2xl overflow-hidden shadow-[0_0_50px_rgba(139,92,246,0.25)] h-[85vh] max-h-[800px] z-10 animate-in fade-in zoom-in duration-200">
         
-        <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-800/50 bg-zinc-950">
-          <h2 className="text-base font-semibold text-zinc-200">Ayush's Agent</h2>
+        <div className="flex items-center justify-between px-6 py-4 border-b border-purple-500/20 bg-[#0c0819]">
+          <div className="flex items-center gap-3">
+            <div className="relative flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-400/20 to-purple-600/20 border border-purple-500/30">
+              <Bot className="w-4 h-4 text-cyan-300" />
+              <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-emerald-400 rounded-full border-2 border-[#0c0819] animate-pulse"></span>
+            </div>
+            <div>
+              <h2 className="text-sm font-bold text-white tracking-wide uppercase font-heading">Ayush's AI Agent</h2>
+              <p className="text-[10px] font-mono text-purple-300/80">Groq Llama-3 + RAG Context</p>
+            </div>
+          </div>
           <button 
             onClick={() => setIsOpen(false)}
-            className="p-2 text-zinc-400 hover:text-white transition-colors"
+            className="p-1.5 text-zinc-400 hover:text-white bg-purple-950/40 border border-purple-500/20 rounded-lg transition-colors"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
 
-        <div className="flex-grow overflow-y-auto p-4 sm:p-8 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-zinc-800 [&::-webkit-scrollbar-track]:bg-transparent">
-          <div className="max-w-2xl mx-auto space-y-8">
+        <div className="flex-grow overflow-y-auto p-4 sm:p-6 bg-[#080511]/60 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-purple-900/40 [&::-webkit-scrollbar-track]:bg-transparent">
+          <div className="max-w-2xl mx-auto space-y-6">
             {messages.map((msg, index) => (
               <div key={msg.id} className={`flex w-full ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                 
                 {msg.role === 'user' ? (
-                  <div className="max-w-[75%] px-5 py-3 rounded-3xl bg-zinc-800 text-zinc-100 text-base leading-relaxed break-words">
+                  <div className="max-w-[75%] px-5 py-3 rounded-2xl rounded-br-sm bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-sm sm:text-base leading-relaxed break-words shadow-[0_0_15px_rgba(139,92,246,0.25)] border border-purple-400/30">
                     {msg.content}
                   </div>
                 ) : (
-                  <div className="flex gap-4 w-full max-w-[95%]">
-                    <div className="w-8 h-8 rounded-full border border-zinc-700 bg-zinc-900 flex items-center justify-center shrink-0 mt-0.5">
-                      <Bot className="w-5 h-5 text-zinc-300" />
+                  <div className="flex gap-3.5 w-full max-w-[95%]">
+                    <div className="w-8 h-8 rounded-xl border border-purple-500/30 bg-[#120D24] flex items-center justify-center shrink-0 mt-0.5 shadow-sm">
+                      <Bot className="w-4 h-4 text-cyan-400" />
                     </div>
-                    <div className="flex-1 min-w-0 pt-1">
+                    <div className="flex-1 min-w-0 pt-1 text-zinc-200">
                       {index === messages.length - 1 && isLoading ? (
                         <ActiveTypewriter text={msg.content} isStreamActive={isLoading} />
                       ) : (
-                        <div className="w-full break-words text-base">
+                        <div className="w-full break-words text-sm sm:text-base">
                           {formatMessage(msg.content)}
                         </div>
                       )}
@@ -230,20 +239,20 @@ const ChatModal = () => {
           </div>
         </div>
 
-        <div className="p-4 bg-zinc-950 border-t border-zinc-800/50">
-          <form onSubmit={handleSendMessage} className="max-w-2xl mx-auto relative flex items-center bg-zinc-800/50 border border-zinc-700 rounded-full px-2 py-2 focus-within:bg-zinc-800 transition-colors">
+        <div className="p-4 bg-[#0c0819] border-t border-purple-500/20">
+          <form onSubmit={handleSendMessage} className="max-w-2xl mx-auto relative flex items-center bg-[#120D24] border border-purple-500/30 rounded-full px-2 py-1.5 focus-within:border-cyan-400 focus-within:shadow-[0_0_15px_rgba(56,189,248,0.25)] transition-all">
             <input
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               disabled={isLoading}
-              placeholder="Message Ayush's Agent..."
-              className="flex-grow w-full min-w-0 bg-transparent text-zinc-100 px-4 py-2 focus:outline-none text-base placeholder-zinc-500 disabled:opacity-50"
+              placeholder="Ask me about Ayush's skills, backend architectures, RAG..."
+              className="flex-grow w-full min-w-0 bg-transparent text-zinc-100 px-4 py-2 focus:outline-none text-xs sm:text-sm placeholder-zinc-500 disabled:opacity-50"
             />
             <button 
               type="submit" 
               disabled={isLoading || !input.trim()}
-              className="bg-white text-black w-8 h-8 rounded-full hover:bg-zinc-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center shrink-0 mr-1"
+              className="neon-gradient-btn text-white w-9 h-9 rounded-full transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center shrink-0 mr-0.5 shadow-md"
             >
               <ArrowUp className="w-4 h-4 stroke-[3]" />
             </button>

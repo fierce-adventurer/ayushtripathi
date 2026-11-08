@@ -57,53 +57,77 @@ const MetricsSection = () => {
   }, []);
 
   return (
-    <div id="metrics" className="w-full pt-20 sm:pt-24 min-h-[30vh]">
-      <div className="flex items-center gap-2 sm:gap-3 mb-8 sm:mb-10">
-        <Activity className="w-5 h-5 sm:w-6 sm:h-6 text-white shrink-0" />
-        <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">System_Nodes</h2>
-        <span className="relative flex h-2 w-2">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
-          <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+    <div id="metrics" className="w-full pt-20 sm:pt-24 min-h-[25vh]">
+      <div className="flex items-center gap-2 sm:gap-3 mb-8">
+        <Activity className="w-5 h-5 text-cyan-400 shrink-0" />
+        <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">System Metrics & Profiles</h2>
+        <span className="relative flex h-2 w-2 ml-1">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+          <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-400"></span>
         </span>
       </div>
 
-      {/* Adjusted grid for better tablet/mobile scaling */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 w-full">
         
-        <a href="https://github.com/fierce-adventurer" target="_blank" rel="noreferrer" className="group flex flex-col items-center justify-center p-4 sm:p-6 bg-zinc-950 border border-zinc-800 rounded-2xl hover:border-white transition-all duration-300 w-full min-w-0">
-          <Github className="w-6 h-6 sm:w-7 sm:h-7 text-zinc-500 group-hover:text-white mb-2 sm:mb-3 transition-colors shrink-0" />
-          <span className="text-[10px] sm:text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Source</span>
-          <span className="text-xs sm:text-sm font-mono text-white text-center break-words">
-            {stats.github.loading ? <Loader2 className="w-4 h-4 animate-spin" /> : `${stats.github.repos} Repos`}
+        <a 
+          href="https://github.com/fierce-adventurer" 
+          target="_blank" 
+          rel="noreferrer" 
+          className="group glass-card p-4 sm:p-6 rounded-2xl hover:border-cyan-400/50 transition-all duration-300 hover:shadow-[0_0_25px_rgba(6,182,212,0.15)] flex flex-col items-center justify-center min-w-0"
+        >
+          <Github className="w-6 h-6 sm:w-7 sm:h-7 text-zinc-400 group-hover:text-cyan-300 mb-2 transition-colors shrink-0" />
+          <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1">GitHub</span>
+          <span className="text-xs sm:text-sm font-bold text-white text-center">
+            {stats.github.loading ? <Loader2 className="w-4 h-4 animate-spin text-cyan-400" /> : `${stats.github.repos} Repos`}
           </span>
         </a>
 
-        <a href="https://leetcode.com/u/ayushtripathi2005/" target="_blank" rel="noreferrer" className="group flex flex-col items-center justify-center p-4 sm:p-6 bg-zinc-950 border border-zinc-800 rounded-2xl hover:border-white transition-all duration-300 w-full min-w-0">
-          <Code2 className="w-6 h-6 sm:w-7 sm:h-7 text-zinc-500 group-hover:text-white mb-2 sm:mb-3 transition-colors shrink-0" />
-          <span className="text-[10px] sm:text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1 truncate max-w-full">LEETCODE</span>
-          <span className="text-xs sm:text-sm font-mono text-white text-center break-words">
-            {stats.leetcode.loading ? <Loader2 className="w-4 h-4 animate-spin" /> : `${stats.leetcode.solved} Solved`}
+        <a 
+          href="https://leetcode.com/u/ayushtripathi2005/" 
+          target="_blank" 
+          rel="noreferrer" 
+          className="group glass-card p-4 sm:p-6 rounded-2xl hover:border-amber-400/50 transition-all duration-300 hover:shadow-[0_0_25px_rgba(249,115,22,0.15)] flex flex-col items-center justify-center min-w-0"
+        >
+          <Code2 className="w-6 h-6 sm:w-7 sm:h-7 text-zinc-400 group-hover:text-amber-400 mb-2 transition-colors shrink-0" />
+          <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1 truncate max-w-full">LeetCode</span>
+          <span className="text-xs sm:text-sm font-bold text-white text-center">
+            {stats.leetcode.loading ? <Loader2 className="w-4 h-4 animate-spin text-amber-400" /> : `${stats.leetcode.solved} Solved`}
           </span>
         </a>
 
-        <a href="https://codeforces.com/profile/fierce-adventurer" target="_blank" rel="noreferrer" className="group flex flex-col items-center justify-center p-4 sm:p-6 bg-zinc-950 border border-zinc-800 rounded-2xl hover:border-white transition-all duration-300 w-full min-w-0">
-          <Terminal className="w-6 h-6 sm:w-7 sm:h-7 text-zinc-500 group-hover:text-white mb-2 sm:mb-3 transition-colors shrink-0" />
-          <span className="text-[10px] sm:text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1 truncate max-w-full">CP_Rating</span>
-          <span className="text-xs sm:text-sm font-mono text-white text-center break-words">
-            {stats.codeforces.loading ? <Loader2 className="w-4 h-4 animate-spin" /> : `${stats.codeforces.rating}`}
+        <a 
+          href="https://codeforces.com/profile/fierce-adventurer" 
+          target="_blank" 
+          rel="noreferrer" 
+          className="group glass-card p-4 sm:p-6 rounded-2xl hover:border-cyan-400/50 transition-all duration-300 hover:shadow-[0_0_25px_rgba(6,182,212,0.15)] flex flex-col items-center justify-center min-w-0"
+        >
+          <Terminal className="w-6 h-6 sm:w-7 sm:h-7 text-zinc-400 group-hover:text-cyan-400 mb-2 transition-colors shrink-0" />
+          <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1 truncate max-w-full">Codeforces</span>
+          <span className="text-xs sm:text-sm font-bold text-white text-center">
+            {stats.codeforces.loading ? <Loader2 className="w-4 h-4 animate-spin text-cyan-400" /> : `${stats.codeforces.rating}`}
           </span>
         </a>
 
-        <a href="https://www.linkedin.com/in/ayush-tripathi-89265923a/" target="_blank" rel="noreferrer" className="group flex flex-col items-center justify-center p-4 sm:p-6 bg-zinc-950 border border-zinc-800 rounded-2xl hover:border-white transition-all duration-300 w-full min-w-0">
-          <Linkedin className="w-6 h-6 sm:w-7 sm:h-7 text-zinc-500 group-hover:text-white mb-2 sm:mb-3 transition-colors shrink-0" />
-          <span className="text-[10px] sm:text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Connect</span>
-          <span className="text-xs sm:text-sm font-mono text-white text-center break-words">LinkedIn</span>
+        <a 
+          href="https://www.linkedin.com/in/ayush-tripathi-89265923a/" 
+          target="_blank" 
+          rel="noreferrer" 
+          className="group glass-card p-4 sm:p-6 rounded-2xl hover:border-blue-400/50 transition-all duration-300 hover:shadow-[0_0_25px_rgba(59,130,246,0.15)] flex flex-col items-center justify-center min-w-0"
+        >
+          <Linkedin className="w-6 h-6 sm:w-7 sm:h-7 text-zinc-400 group-hover:text-blue-400 mb-2 transition-colors shrink-0" />
+          <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1">LinkedIn</span>
+          <span className="text-xs sm:text-sm font-bold text-white text-center">Connect</span>
         </a>
 
-        <a href="https://drive.google.com/file/d/1mkDrr9xYSplGzt3btQkSZnR-FzJvXJgq/view?usp=drive_link" target="_blank" rel="noreferrer" className="group flex flex-col items-center justify-center p-4 sm:p-6 bg-zinc-950 border border-zinc-800 rounded-2xl hover:border-white transition-all duration-300 w-full min-w-0">
-          <FileDown className="w-6 h-6 sm:w-7 sm:h-7 text-zinc-500 group-hover:text-white mb-2 sm:mb-3 transition-colors shrink-0" />
-          <span className="text-[10px] sm:text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Payload</span>
-          <span className="text-xs sm:text-sm font-mono text-white text-center break-words">Resume.pdf</span>
+        <a 
+          href="https://drive.google.com/file/d/1mkDrr9xYSplGzt3btQkSZnR-FzJvXJgq/view?usp=drive_link" 
+          target="_blank" 
+          rel="noreferrer" 
+          className="group glass-card p-4 sm:p-6 rounded-2xl hover:border-purple-400/50 transition-all duration-300 hover:shadow-[0_0_25px_rgba(139,92,246,0.15)] flex flex-col items-center justify-center min-w-0"
+        >
+          <FileDown className="w-6 h-6 sm:w-7 sm:h-7 text-zinc-400 group-hover:text-purple-400 mb-2 transition-colors shrink-0" />
+          <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1">Resume</span>
+          <span className="text-xs sm:text-sm font-bold text-white text-center">Download</span>
         </a>
 
       </div>

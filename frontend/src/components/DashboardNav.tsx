@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, Sparkles } from 'lucide-react';
 
 const DashboardNav = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -8,65 +8,92 @@ const DashboardNav = () => {
   const closeMenu = () => setIsMobileMenuOpen(false);
 
   return (
-    // Changed w-[95%] to a safer w-[calc(100%-1rem)] sm:w-[95%] to prevent edge clipping on very small phones
-    <nav className="fixed top-4 sm:top-6 left-1/2 transform -translate-x-1/2 z-50 w-[calc(100%-1rem)] sm:w-[95%] max-w-5xl">
-      <div className="bg-zinc-950/90 backdrop-blur-md border border-zinc-800 rounded-xl p-2 flex items-center shadow-2xl relative">
+    <nav className="fixed top-4 sm:top-6 left-1/2 transform -translate-x-1/2 z-50 w-[calc(100%-1.5rem)] sm:w-[95%] max-w-5xl">
+      <div className="bg-[#0e0a20]/80 backdrop-blur-xl border border-purple-900/40 rounded-2xl p-2.5 sm:px-5 flex items-center justify-between shadow-[0_10px_35px_rgba(0,0,0,0.5)]">
         
+        {/* Brand / Logo (matching reference style) */}
+        <a href="#about" className="flex items-center gap-1.5 text-base sm:text-lg font-bold tracking-tight text-white group shrink-0">
+          <span className="font-mono text-cyan-400 group-hover:text-purple-400 transition-colors">&lt;</span>
+          <span className="bg-gradient-to-r from-white via-slate-200 to-cyan-400 bg-clip-text text-transparent">Ayush</span>
+          <span className="font-mono text-purple-400 group-hover:text-cyan-400 transition-colors">/&gt;</span>
+        </a>
+
+        {/* Mobile menu hamburger button */}
         <button 
           onClick={toggleMenu}
-          className="md:hidden px-2 sm:px-3 py-2 text-zinc-400 hover:text-white transition-colors focus:outline-none shrink-0"
+          className="md:hidden px-2.5 py-1.5 text-zinc-400 hover:text-white transition-colors focus:outline-none shrink-0"
         >
-          {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          {isMobileMenuOpen ? <X className="w-5 h-5 text-cyan-400" /> : <Menu className="w-5 h-5" />}
         </button>
 
-        <div className="hidden md:flex flex-1 items-center justify-evenly px-2">
-          <a href="#about" className="px-3 py-2 rounded-lg text-sm font-mono font-medium text-zinc-400 hover:text-white hover:bg-zinc-900 transition-colors whitespace-nowrap">~/about</a>
-          <a href="#experience" className="px-3 py-2 rounded-lg text-sm font-mono font-medium text-zinc-400 hover:text-white hover:bg-zinc-900 transition-colors whitespace-nowrap">~/experience</a>
-          <a href="#projects" className="px-3 py-2 rounded-lg text-sm font-mono font-medium text-zinc-400 hover:text-white hover:bg-zinc-900 transition-colors whitespace-nowrap">~/projects</a>
-          <a href="#metrics" className="px-3 py-2 rounded-lg text-sm font-mono font-medium text-zinc-400 hover:text-white hover:bg-zinc-900 transition-colors whitespace-nowrap">~/metrics</a>
-          
+        {/* Desktop Navigation Links */}
+        <div className="hidden md:flex items-center gap-1 lg:gap-2">
+          <a href="#about" className="px-3 py-1.5 rounded-lg text-xs lg:text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/5 transition-colors">
+            About Me
+          </a>
+          <a href="#experience" className="px-3 py-1.5 rounded-lg text-xs lg:text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/5 transition-colors">
+            Experiences
+          </a>
+          <a href="#projects" className="px-3 py-1.5 rounded-lg text-xs lg:text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/5 transition-colors">
+            Projects
+          </a>
+          <a href="#metrics" className="px-3 py-1.5 rounded-lg text-xs lg:text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/5 transition-colors">
+            Metrics
+          </a>
           <button 
             onClick={() => window.dispatchEvent(new Event('open-payment-gateway'))}
-            className="px-3 py-2 rounded-lg text-sm font-mono font-medium text-zinc-400 hover:text-white hover:bg-zinc-900 transition-colors whitespace-nowrap cursor-pointer"
+            className="px-3 py-1.5 rounded-lg text-xs lg:text-sm font-medium text-zinc-300 hover:text-cyan-400 hover:bg-white/5 transition-colors cursor-pointer"
           >
-            ~/sponsor
+            Sponsor
           </button>
-
-          <a href="#contact" className="px-3 py-2 rounded-lg text-sm font-mono font-medium text-zinc-400 hover:text-white hover:bg-zinc-900 transition-colors whitespace-nowrap">~/contact</a>
+          <a href="#contact" className="px-3 py-1.5 rounded-lg text-xs lg:text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/5 transition-colors">
+            Contact
+          </a>
         </div>
         
-        {/* Adjusted padding and font size for the AI button on very small screens to prevent overlap */}
-        <div className="flex items-center pl-2 sm:pl-4 border-l border-zinc-800 ml-auto md:ml-2">
+        {/* Right Action: AI Chat Button */}
+        <div className="hidden md:flex items-center">
           <button 
             onClick={() => {
               window.dispatchEvent(new Event('open-ai-chat'));
               closeMenu(); 
             }}
-            className="px-3 sm:px-4 py-2 bg-white text-zinc-950 text-[10px] sm:text-xs md:text-sm font-mono font-bold rounded-lg hover:bg-zinc-200 transition-all cursor-pointer shadow-sm whitespace-nowrap"
+            className="neon-gradient-btn px-4 py-2 text-white text-xs lg:text-sm font-medium rounded-xl flex items-center gap-2 cursor-pointer shadow-lg"
           >
-            ./talk_to_ai.sh
+            <Sparkles className="w-3.5 h-3.5 text-cyan-300" />
+            <span>Talk to AI</span>
           </button>
         </div>
       </div>
 
+      {/* Mobile Drawer */}
       {isMobileMenuOpen && (
-        <div className="md:hidden absolute top-full left-0 right-0 mt-2 bg-zinc-950/95 backdrop-blur-md border border-zinc-800 rounded-xl p-2 flex flex-col shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-          <a href="#about" onClick={closeMenu} className="px-4 py-3 text-sm font-mono font-medium text-zinc-400 hover:text-white hover:bg-zinc-900 rounded-lg transition-colors">~/about</a>
-          <a href="#experience" onClick={closeMenu} className="px-4 py-3 text-sm font-mono font-medium text-zinc-400 hover:text-white hover:bg-zinc-900 rounded-lg transition-colors">~/experience</a>
-          <a href="#projects" onClick={closeMenu} className="px-4 py-3 text-sm font-mono font-medium text-zinc-400 hover:text-white hover:bg-zinc-900 rounded-lg transition-colors">~/projects</a>
-          <a href="#metrics" onClick={closeMenu} className="px-4 py-3 text-sm font-mono font-medium text-zinc-400 hover:text-white hover:bg-zinc-900 rounded-lg transition-colors">~/metrics</a>
-          
+        <div className="md:hidden absolute top-full left-0 right-0 mt-2 bg-[#0e0a20]/95 backdrop-blur-2xl border border-purple-900/50 rounded-2xl p-3 flex flex-col shadow-2xl animate-in fade-in slide-in-from-top-2 duration-200">
+          <a href="#about" onClick={closeMenu} className="px-4 py-2.5 text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors">About Me</a>
+          <a href="#experience" onClick={closeMenu} className="px-4 py-2.5 text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors">Experiences</a>
+          <a href="#projects" onClick={closeMenu} className="px-4 py-2.5 text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors">Projects</a>
+          <a href="#metrics" onClick={closeMenu} className="px-4 py-2.5 text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors">Metrics</a>
           <button 
             onClick={() => {
               window.dispatchEvent(new Event('open-payment-gateway'));
               closeMenu();
             }}
-            className="w-full text-left px-4 py-3 text-sm font-mono font-medium text-zinc-400 hover:text-white hover:bg-zinc-900 rounded-lg transition-colors"
+            className="w-full text-left px-4 py-2.5 text-sm font-medium text-zinc-300 hover:text-cyan-400 hover:bg-white/5 rounded-lg transition-colors"
           >
-            ~/sponsor
+            Sponsor
           </button>
-
-          <a href="#contact" onClick={closeMenu} className="px-4 py-3 text-sm font-mono font-medium text-zinc-400 hover:text-white hover:bg-zinc-900 rounded-lg transition-colors">~/contact</a>
+          <a href="#contact" onClick={closeMenu} className="px-4 py-2.5 text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors">Contact</a>
+          
+          <button 
+            onClick={() => {
+              window.dispatchEvent(new Event('open-ai-chat'));
+              closeMenu(); 
+            }}
+            className="neon-gradient-btn mt-2 w-full py-2.5 text-white text-xs font-semibold rounded-xl flex items-center justify-center gap-2 shadow-lg"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-cyan-300" />
+            <span>Talk to AI</span>
+          </button>
         </div>
       )}
     </nav>
